@@ -2,12 +2,28 @@
 
 namespace Prewk\Seriplating;
 
+use Prewk\Seriplating\Contracts\IdFactoryInterface;
 use Prewk\Seriplating\Contracts\RuleInterface;
 use Prewk\Seriplating\Contracts\SerializerInterface;
 use Prewk\Seriplating\Errors\IntegrityException;
 
 class GenericSerializer implements SerializerInterface
 {
+    /**
+     * @var IdFactoryInterface
+     */
+    protected $idFactory;
+
+    /**
+     * @param IdFactoryInterface $idFactory
+     */
+    public function __construct(
+        IdFactoryInterface $idFactory
+    )
+    {
+        $this->idFactory = $idFactory;
+    }
+
     public function serialize(array $template, array $toSerialize)
     {
         $serialized = $this->walkUnserializedData($template, $toSerialize);
@@ -47,6 +63,8 @@ class GenericSerializer implements SerializerInterface
         } else {
             if ($template->isValue()) {
                 return $data;
+            } elseif ($template->isReference()) {
+                return ["_ref" => $this->idFactory->get($template->getValue(), $data)];
             } else {
                 throw new IntegrityException("Invalid template rule");
             }

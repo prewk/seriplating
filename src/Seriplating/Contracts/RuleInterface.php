@@ -10,6 +10,8 @@ interface RuleInterface
 
     public function make($type, $value = null);
 
+    public function getValue();
+
     /**
      * @return bool
      */

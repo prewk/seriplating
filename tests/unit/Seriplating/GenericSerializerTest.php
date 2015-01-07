@@ -3,16 +3,20 @@
 namespace Prewk\Seriplating;
 
 use SeriplatingTestCase;
+use Mockery;
 
 class GenericSerializerTest extends SeriplatingTestCase
 {
     private $seriplater;
+    private $idFactory;
 
     public function setUp()
     {
         $this->seriplater = new Seriplater(
             new Rule
         );
+
+        $this->idFactory = Mockery::mock("Prewk\\Seriplating\\Contracts\\IdFactoryInterface");
     }
 
     public function test_value()
@@ -32,7 +36,32 @@ class GenericSerializerTest extends SeriplatingTestCase
         ];
         $expected = $entity;
 
-        $ser = new GenericSerializer;
+        $ser = new GenericSerializer($this->idFactory);
+        $serialized = $ser->serialize($template, $entity);
+
+        $this->assertEquals($expected, $serialized);
+    }
+
+    public function test_references()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "foo_id" => $t->references("foos"),
+        ];
+        $entity = [
+            "foo_id" => 123,
+        ];
+        $expected = [
+            "foo_id" => ["_ref" => "foos_0"],
+        ];
+
+        $this->idFactory
+            ->shouldReceive("get")
+            ->with("foos", 123)
+            ->andReturn("foos_0");
+
+        $ser = new GenericSerializer($this->idFactory);
         $serialized = $ser->serialize($template, $entity);
 
         $this->assertEquals($expected, $serialized);

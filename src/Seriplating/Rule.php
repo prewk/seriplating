@@ -33,6 +33,11 @@ class Rule implements RuleInterface
         return $product;
     }
 
+    public function getValue()
+    {
+        return $this->value;
+    }
+
     /**
      * @return bool
      */
