@@ -22,10 +22,13 @@ class GenericSerializerTest extends SeriplatingTestCase
         $template = [
             "foo" => $t->value(),
             "baz" => $t->value(),
+            "lorem" => $t->optional()->value(),
+            "ipsum" => $t->optional()->value(),
         ];
         $entity = [
             "foo" => "bar",
             "baz" => "qux",
+            "ipsum" => "asdf",
         ];
         $expected = $entity;
 

@@ -2,6 +2,7 @@
 
 namespace Prewk\Seriplating;
 
+use Prewk\Seriplating\Contracts\RuleInterface;
 use Prewk\Seriplating\Contracts\SerializerInterface;
 use Prewk\Seriplating\Errors\IntegrityException;
 
@@ -34,7 +35,7 @@ class GenericSerializer implements SerializerInterface
                 if (!isset($data[$field]) &&
                     $content instanceof RuleInterface &&
                     $content->isOptional()) {
-                    break;
+                    continue;
                 } elseif (!isset($data[$field])) {
                     throw new IntegrityException("Required field '$field' missing");
                 }
