@@ -2,6 +2,7 @@
 
 namespace Prewk\Seriplating;
 
+use Illuminate\Support\Arr;
 use Prewk\Seriplating\Contracts\DeserializerInterface;
 use Prewk\Seriplating\Contracts\IdResolverInterface;
 use Prewk\Seriplating\Contracts\RepositoryInterface;
@@ -21,6 +22,11 @@ class GenericDeserializer implements DeserializerInterface
     protected $idName;
 
     /**
+     * @var array
+     */
+    protected $updatesToDefer = [];
+
+    /**
      * @param IdResolverInterface $idResolver
      */
     public function __construct(
@@ -35,9 +41,22 @@ class GenericDeserializer implements DeserializerInterface
         $entityData = $this->walkDeserializedData($template, $toUnserialize);
 
         $createdEntity = $repository->create($entityData);
+        $primaryKey = $createdEntity[$primaryKeyField];
 
         if (isset($this->idName)) {
-            $this->idResolver->bind($this->idName, $createdEntity[$primaryKeyField]);
+            $this->idResolver->bind($this->idName, $primaryKey);
+        }
+
+        foreach ($this->updatesToDefer as $updateToDefer) {
+            $this->idResolver->deferResolution($updateToDefer["internalId"], function($dbId) use ($repository, $updateToDefer, $primaryKey, $createdEntity) {
+                if ($updateToDefer["overwriteField"]) {
+                    $repository->update($primaryKey, $updateToDefer["targetField"], $dbId);
+                } else {
+                    $newFieldData = $createdEntity[$updateToDefer["targetField"]];
+                    Arr::set($newFieldData, $updateToDefer["dotPath"], $dbId);
+                    $repository->update($primaryKey, $updateToDefer["targetField"], $newFieldData);
+                }
+            });
         }
 
         return $createdEntity;
@@ -84,6 +103,18 @@ class GenericDeserializer implements DeserializerInterface
         } else {
             if ($template->isValue()) {
                 return $data;
+            } elseif ($template->isReference()) {
+                $dotParts = explode(".", $dotPath);
+
+                $this->updatesToDefer[] = [
+                    "targetField" => $dotParts[0],
+                    "entityName" => $template->getValue(),
+                    "internalId" => $data["_ref"],
+                    "overwriteField" => count($dotParts) === 1,
+                    "dotPath" => (count($dotParts) === 1) ? null : substr($dotPath, strlen($dotParts[0] + 1)),
+                ];
+
+                return 0;
             } else {
                 throw new IntegrityException("Invalid template rule");
             }

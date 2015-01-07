@@ -96,4 +96,39 @@ class GenericDeserializerTest extends SeriplatingTestCase
 
         $this->assertEquals($expectedEntityData, $entityData);
     }
+
+    public function test_references()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "foo_id" => $t->references("foos"),
+        ];
+        $serialized = [
+            "foo_id" => ["_ref" => "foos_0"],
+        ];
+        $expected = [
+            "foo_id" => 0,
+        ];
+        $expectedEntityData = [
+            "id" => 123,
+            "foo" => 0,
+        ];
+
+        $this->repository
+            ->shouldReceive("create")
+            ->once()
+            ->with($expected)
+            ->andReturn($expectedEntityData);
+
+        $this->idResolver
+            ->shouldReceive("deferResolution")
+            ->once()
+            ->with("foos_0", Mockery::any());
+
+        $deser = new GenericDeserializer($this->idResolver);
+        $entityData = $deser->deserialize($template, $this->repository, $serialized);
+
+        $this->assertEquals($expectedEntityData, $entityData);
+    }
 }
