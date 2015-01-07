@@ -197,4 +197,133 @@ class GenericDeserializerTest extends SeriplatingTestCase
 
         $this->assertEquals($expectedEntityData2, $entityData);
     }
+
+    public function test_deserialize_deep()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "data" => $t->deep([
+                "/\\.blocks\\.\\d+.id$/" => $t->references("blocks"),
+                "/^resources\\.[\\d]+\\.id$/" => $t->references("resources"),
+            ]),
+        ];
+        $serialized = [
+            "data" => [
+                "rows" => [
+                    [
+                        "columns" => [
+                            [
+                                "blocks" => [
+                                    ["id" => ["_ref" => "blocks_0"]],
+                                    ["id" => ["_ref" => "blocks_1"]],
+                                ],
+                            ],
+                            [
+                                "blocks" => [
+                                    ["id" => ["_ref" => "blocks_2"]],
+                                    ["id" => ["_ref" => "blocks_3"]],
+                                ],
+                            ],
+                        ],
+                        "foo" => "bar",
+                    ],
+                ],
+                "resources" => [
+                    ["id" => ["_ref" => "resources_0"], "transforms" => []],
+                    ["id" => ["_ref" => "resources_1"], "transforms" => []],
+                ],
+                "foo" => "baz",
+            ],
+        ];
+        $expected = [
+            "data" => [
+                "rows" => [
+                    [
+                        "columns" => [
+                            [
+                                "blocks" => [
+                                    ["id" => 0],
+                                    ["id" => 0],
+                                ],
+                            ],
+                            [
+                                "blocks" => [
+                                    ["id" => 0],
+                                    ["id" => 0],
+                                ],
+                            ],
+                        ],
+                        "foo" => "bar",
+                    ],
+                ],
+                "resources" => [
+                    ["id" => 0, "transforms" => []],
+                    ["id" => 0, "transforms" => []],
+                ],
+                "foo" => "baz",
+            ],
+        ];
+        $expectedEntityData = [
+            "id" => 123,
+            "data" => [
+                "rows" => [
+                    [
+                        "columns" => [
+                            [
+                                "blocks" => [
+                                    ["id" => 0],
+                                    ["id" => 0],
+                                ],
+                            ],
+                            [
+                                "blocks" => [
+                                    ["id" => 0],
+                                    ["id" => 0],
+                                ],
+                            ],
+                        ],
+                        "foo" => "bar",
+                    ],
+                ],
+                "resources" => [
+                    ["id" => 0, "transforms" => []],
+                    ["id" => 0, "transforms" => []],
+                ],
+                "foo" => "baz",
+            ],
+        ];
+
+        $this->idResolver
+            ->shouldReceive("deferResolution")
+            ->once()
+            ->with("blocks_0", Mockery::any())
+            ->shouldReceive("deferResolution")
+            ->once()
+            ->with("blocks_1", Mockery::any())
+            ->shouldReceive("deferResolution")
+            ->once()
+            ->with("blocks_2", Mockery::any())
+            ->shouldReceive("deferResolution")
+            ->once()
+            ->with("blocks_3", Mockery::any())
+
+            ->shouldReceive("deferResolution")
+            ->once()
+            ->with("resources_0", Mockery::any())
+            ->shouldReceive("deferResolution")
+            ->once()
+            ->with("resources_1", Mockery::any());
+
+        $this->repository
+            ->shouldReceive("create")
+            ->once()
+            ->with($expected)
+            ->andReturn($expectedEntityData);
+
+        $deser = new GenericDeserializer($this->idResolver);
+        $entityData = $deser->deserialize($template, $this->repository, $serialized);
+
+        $this->assertEquals($expectedEntityData, $entityData);
+    }
 }

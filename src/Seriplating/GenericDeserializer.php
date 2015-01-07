@@ -143,6 +143,27 @@ class GenericDeserializer implements DeserializerInterface
                 } else {
                     return $this->walkDeserializedData($rule, $data, $dotPath);
                 }
+            } elseif ($template->isDeep()) {
+                $finders = $template->getValue();
+                $newData = $data;
+                $dotData = Arr::dot($data);
+
+                foreach ($finders as $pattern => $rule) {
+                    foreach ($dotData as $innerDotPath => $innerDotValue) {
+                        // Back up one step if we're on ._ref
+                        if (preg_match("/\\._ref$/", $innerDotPath) === 1) {
+                            $innerDotPath = substr($innerDotPath, 0, -1 * strlen("._ref"));
+                            $innerDotValue = ["_ref" => $innerDotValue];
+                        }
+
+                        if (preg_match($pattern, $innerDotPath) === 1) {
+
+                            Arr::set($newData, $innerDotPath, $this->walkDeserializedData($rule, $innerDotValue, $this->mergeDotPaths($dotPath, $innerDotPath)));
+                        }
+                    }
+                }
+
+                return $newData;
             } else {
                 throw new IntegrityException("Invalid template rule");
             }
