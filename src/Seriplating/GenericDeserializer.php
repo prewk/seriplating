@@ -30,11 +30,15 @@ class GenericDeserializer implements DeserializerInterface
         $this->idResolver = $idResolver;
     }
 
-    public function deserialize(array $template, RepositoryInterface $repository, array $toUnserialize)
+    public function deserialize(array $template, RepositoryInterface $repository, array $toUnserialize, $primaryKeyField = "id")
     {
         $entityData = $this->walkDeserializedData($template, $toUnserialize);
 
         $createdEntity = $repository->create($entityData);
+
+        if (isset($this->idName)) {
+            $this->idResolver->bind($this->idName, $createdEntity[$primaryKeyField]);
+        }
 
         return $createdEntity;
     }
@@ -57,6 +61,13 @@ class GenericDeserializer implements DeserializerInterface
 
             foreach ($template as $field => $content) {
                 if (
+                    $content instanceof RuleInterface &&
+                    $content->isId() &&
+                    isset($data["_id"])
+                ) {
+                    $this->idName = $data["_id"];
+                    continue;
+                } elseif (
                     !isset($data[$field]) &&
                     $content instanceof RuleInterface &&
                     $content->isOptional()

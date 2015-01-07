@@ -49,12 +49,47 @@ class GenericDeserializerTest extends SeriplatingTestCase
             "ipsum" => "asdf",
         ];
 
+        $this->repository
+            ->shouldReceive("create")
+            ->once()
+            ->with($expected)
+            ->andReturn($expectedEntityData);
+
+        $deser = new GenericDeserializer($this->idResolver);
+        $entityData = $deser->deserialize($template, $this->repository, $serialized);
+
+        $this->assertEquals($expectedEntityData, $entityData);
+    }
+
+    public function test_id()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "id" => $t->id("foos"),
+            "bar" => $t->value(),
+        ];
+        $serialized = [
+            "_id" => "foos_0",
+            "bar" => "baz",
+        ];
+        $expected = [
+            "bar" => "baz",
+        ];
+        $expectedEntityData = [
+            "id" => 123,
+            "bar" => "baz",
+        ];
 
         $this->repository
             ->shouldReceive("create")
             ->once()
             ->with($expected)
             ->andReturn($expectedEntityData);
+
+        $this->idResolver
+            ->shouldReceive("bind")
+            ->with("foos_0", 123);
 
         $deser = new GenericDeserializer($this->idResolver);
         $entityData = $deser->deserialize($template, $this->repository, $serialized);
