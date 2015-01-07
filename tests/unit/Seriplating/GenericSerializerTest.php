@@ -153,7 +153,101 @@ class GenericSerializerTest extends SeriplatingTestCase
 
         $ser = new GenericSerializer($this->idFactory);
         $serialized = $ser->serialize($template, $entity2);
-        
+
         $this->assertEquals($expected2, $serialized);
+    }
+
+    public function test_deep()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "data" => $t->deep([
+                "/\\.blocks\\.\\d+.id$/" => $t->references("blocks"),
+                "/^resources\\.[\\d]+\\.id$/" => $t->references("resources"),
+            ]),
+        ];
+        $entity = [
+            "data" => [
+                "rows" => [
+                    [
+                        "columns" => [
+                            [
+                                "blocks" => [
+                                    ["id" => 1],
+                                    ["id" => 2],
+                                ],
+                            ],
+                            [
+                                "blocks" => [
+                                    ["id" => 3],
+                                    ["id" => 4],
+                                ],
+                            ],
+                        ],
+                        "foo" => "bar",
+                    ],
+                ],
+                "resources" => [
+                    ["id" => 5, "transforms" => []],
+                    ["id" => 6, "transforms" => []],
+                ],
+                "foo" => "baz",
+            ],
+        ];
+        $expected = [
+            "data" => [
+                "rows" => [
+                    [
+                        "columns" => [
+                            [
+                                "blocks" => [
+                                    ["id" => ["_ref" => "blocks_0"]],
+                                    ["id" => ["_ref" => "blocks_1"]],
+                                ],
+                            ],
+                            [
+                                "blocks" => [
+                                    ["id" => ["_ref" => "blocks_2"]],
+                                    ["id" => ["_ref" => "blocks_3"]],
+                                ],
+                            ],
+                        ],
+                        "foo" => "bar",
+                    ],
+                ],
+                "resources" => [
+                    ["id" => ["_ref" => "resources_0"], "transforms" => []],
+                    ["id" => ["_ref" => "resources_1"], "transforms" => []],
+                ],
+                "foo" => "baz",
+            ],
+        ];
+
+        $this->idFactory
+            ->shouldReceive("get")
+            ->with("blocks", 1)
+            ->andReturn("blocks_0")
+            ->shouldReceive("get")
+            ->with("blocks", 2)
+            ->andReturn("blocks_1")
+            ->shouldReceive("get")
+            ->with("blocks", 3)
+            ->andReturn("blocks_2")
+            ->shouldReceive("get")
+            ->with("blocks", 4)
+            ->andReturn("blocks_3")
+
+            ->shouldReceive("get")
+            ->with("resources", 5)
+            ->andReturn("resources_0")
+            ->shouldReceive("get")
+            ->with("resources", 6)
+            ->andReturn("resources_1");
+
+        $ser = new GenericSerializer($this->idFactory);
+        $serialized = $ser->serialize($template, $entity);
+
+        $this->assertEquals($expected, $serialized);
     }
 }

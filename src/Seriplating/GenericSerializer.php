@@ -2,6 +2,7 @@
 
 namespace Prewk\Seriplating;
 
+use Illuminate\Support\Arr;
 use Prewk\Seriplating\Contracts\IdFactoryInterface;
 use Prewk\Seriplating\Contracts\RuleInterface;
 use Prewk\Seriplating\Contracts\SerializerInterface;
@@ -111,7 +112,20 @@ class GenericSerializer implements SerializerInterface
                 } else {
                     return $this->walkUnserializedData($rule, $data, $dotPath);
                 }
+            } elseif ($template->isDeep()) {
+                $finders = $template->getValue();
+                $newData = $data;
+                $dotData = Arr::dot($data);
 
+                foreach ($finders as $pattern => $rule) {
+                    foreach ($dotData as $innerDotPath => $innerDotValue) {
+                        if (preg_match($pattern, $innerDotPath) === 1) {
+                            Arr::set($newData, $innerDotPath, $this->walkUnserializedData($rule, $innerDotValue, $this->mergeDotPaths($dotPath, $innerDotPath)));
+                        }
+                    }
+                }
+
+                return $newData;
             } else {
                 throw new IntegrityException("Invalid template rule");
             }

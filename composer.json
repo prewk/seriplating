@@ -13,6 +13,7 @@
         }
     },
     "require": {
-        "mockery/mockery": "dev-master"
+        "mockery/mockery": "dev-master",
+        "laravel/framework": "*"
     }
 }
