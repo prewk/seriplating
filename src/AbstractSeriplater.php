@@ -40,7 +40,7 @@ abstract class AbstractSeriplater
 
     public function deserialize(RepositoryInterface $repository, array $toUnserialize)
     {
-        return $this->deserialize($this->getTemplate(), $repository, $toUnserialize);
+        return $this->genericDeserializer->deserialize($this->getTemplate(), $repository, $toUnserialize);
     }
 
 }
