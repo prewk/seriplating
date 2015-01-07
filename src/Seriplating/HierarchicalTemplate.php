@@ -35,5 +35,18 @@ class HierarchicalTemplate implements HierarchicalInterface
         }
 
         $this->templateRegistry[$entityName] = $serializer;
+
+        return $this;
+    }
+
+    public function serialize($entityName, array $unserializedTree)
+    {
+        if (!isset($this->templateRegistry[$entityName])) {
+            throw new HierarchicalCompositionException("Entity '$entityName' wasn't found in the registry");
+        }
+
+        $rootTemplate = $this->templateRegistry[$entityName];
+
+
     }
 }

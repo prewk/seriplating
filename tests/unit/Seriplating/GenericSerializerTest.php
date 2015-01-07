@@ -42,6 +42,25 @@ class GenericSerializerTest extends SeriplatingTestCase
         $this->assertEquals($expected, $serialized);
     }
 
+    public function test_has_many()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "foo" => $t->value(),
+            "bar" => $t->hasMany("bars"),
+        ];
+        $entity = [
+            "foo" => "bar",
+        ];
+        $expected = $entity;
+
+        $ser = new GenericSerializer($this->idFactory);
+        $serialized = $ser->serialize($template, $entity);
+
+        $this->assertEquals($expected, $serialized);
+    }
+
     public function test_references()
     {
         $t = $this->seriplater;

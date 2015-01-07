@@ -57,9 +57,9 @@ class GenericSerializer implements SerializerInterface
 
             foreach ($template as $field => $content) {
                 if (
-                    !isset($data[$field]) &&
                     $content instanceof RuleInterface &&
-                    $content->isOptional()
+                    (!isset($data[$field]) && $content->isOptional()) ||
+                    $content->isHasMany()
                 ) {
                     continue;
                 } elseif (!isset($data[$field])) {
