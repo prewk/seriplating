@@ -46,4 +46,9 @@ interface RuleInterface
      * @return bool
      */
     public function isDeep();
+
+    /**
+     * @return bool
+     */
+    public function isHasMany();
 }

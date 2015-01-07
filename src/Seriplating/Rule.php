@@ -93,4 +93,12 @@ class Rule implements RuleInterface
     {
         return (Seriplater::DEEP & $this->type) !== 0;
     }
+
+    /**
+     * @return bool
+     */
+    public function isHasMany()
+    {
+        return (Seriplater::HAS_MANY & $this->type) !== 0;
+    }
 }

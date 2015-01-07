@@ -4,6 +4,7 @@ namespace Prewk\Seriplating;
 
 use Prewk\Seriplating\Contracts\SeriplaterInterface;
 use Prewk\Seriplating\Contracts\RuleInterface;
+use Prewk\Seriplating\Contracts\SeriplaterRuleInterface;
 
 class Seriplater implements SeriplaterInterface
 {
@@ -14,6 +15,7 @@ class Seriplater implements SeriplaterInterface
     const REFERENCES = 16;
     const CONDITIONS = 32;
     const DEEP = 64;
+    const HAS_MANY = 128;
 
     protected $rule;
 
@@ -123,6 +125,16 @@ class Seriplater implements SeriplaterInterface
     public function deep(array $finders)
     {
         return $this->rule->make($this->applyModifiers(self::DEEP), $finders);
+    }
+
+    /**
+     * Define a relation for use in a hierarchical manner
+     *
+     * @return SeriplaterRuleInterface
+     */
+    public function hasMany()
+    {
+        return $this->rule->make(self::HAS_MANY);
     }
 }
 

@@ -59,4 +59,11 @@ interface SeriplaterInterface
      * @return SeriplaterRuleInterface
      */
     public function deep(array $finders);
+
+    /**
+     * Define a relation for use in a hierarchical manner
+     *
+     * @return SeriplaterRuleInterface
+     */
+    public function hasMany();
 }

@@ -66,4 +66,11 @@ class SeriplaterIntegrationTest extends SeriplatingTestCase
         $this->assertTrue($rule3->isOptional());
         $this->assertTrue($rule3->isCollection());
     }
+
+    public function test_has_many()
+    {
+        $rule = $this->seriplater->hasMany("foos");
+
+        $this->assertTrue($rule->isHasMany());
+    }
 }
