@@ -15,16 +15,16 @@ class HierarchicalTemplateMock extends HierarchicalTemplate
 
 class HierarchicalTemplateTest extends SeriplatingTestCase
 {
-    private $idFactory;
+    private $idResolver;
 
     public function setUp()
     {
-        $this->idFactory = new IdFactory;
+        $this->idResolver = Mockery::mock("Prewk\\Seriplating\\Contracts\\IdResolverInterface");
     }
 
     public function test_that_registration_adds()
     {
-        $hier = new HierarchicalTemplateMock($this->idFactory);
+        $hier = new HierarchicalTemplateMock($this->idResolver);
         $t = new Seriplater(
             new Rule
         );
@@ -48,7 +48,7 @@ class HierarchicalTemplateTest extends SeriplatingTestCase
      */
     public function test_that_missing_ids_fail()
     {
-        $hier = new HierarchicalTemplate;
+        $hier = new HierarchicalTemplate($this->idResolver);
         $t = new Seriplater(
             new Rule
         );
@@ -75,7 +75,7 @@ class HierarchicalTemplateTest extends SeriplatingTestCase
      */
     public function test_that_duplicate_registrations_fail()
     {
-        $hier = new HierarchicalTemplate;
+        $hier = new HierarchicalTemplate($this->idResolver);
         $t = new Seriplater(
             new Rule
         );

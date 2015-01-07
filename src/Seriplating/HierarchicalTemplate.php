@@ -4,6 +4,7 @@ namespace Prewk\Seriplating;
 
 use Prewk\Seriplating\Contracts\BidirectionalTemplateInterface;
 use Prewk\Seriplating\Contracts\HierarchicalInterface;
+use Prewk\Seriplating\Contracts\IdResolverInterface;
 use Prewk\Seriplating\Contracts\RuleInterface;
 use Prewk\Seriplating\Errors\HierarchicalCompositionException;
 
@@ -14,9 +15,19 @@ class HierarchicalTemplate implements HierarchicalInterface
      */
     protected $templateRegistry = [];
 
+    /**
+     * @var
+     */
+    protected $idResolver;
+
+    /**
+     * @param IdResolverInterface $idResolver
+     */
     public function __construct(
+        IdResolverInterface $idResolver
     )
     {
+        $this->idResolver = $idResolver;
     }
 
     public function register(BidirectionalTemplateInterface $serializer)
