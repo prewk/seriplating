@@ -49,6 +49,7 @@ class GenericSerializerTest extends SeriplatingTestCase
         $template = [
             "foo_id" => $t->references("foos"),
             "bar_ids" => $t->collectionOf()->references("bars"),
+            "baz_id" => $t->optional()->references("bazes"),
         ];
         $entity = [
             "foo_id" => 123,
