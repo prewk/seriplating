@@ -84,4 +84,32 @@ class GenericSerializerTest extends SeriplatingTestCase
 
         $this->assertEquals($expected, $serialized);
     }
+
+    public function test_id()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "id" => $t->id("foos"),
+            "bar" => $t->value(),
+        ];
+        $entity = [
+            "id" => 123,
+            "bar" => "baz",
+        ];
+        $expected = [
+            "_id" => "foos_0",
+            "bar" => "baz",
+        ];
+
+        $this->idFactory
+            ->shouldReceive("get")
+            ->with("foos", 123)
+            ->andReturn("foos_0");
+
+        $ser = new GenericSerializer($this->idFactory);
+        $serialized = $ser->serialize($template, $entity);
+
+        $this->assertEquals($expected, $serialized);
+    }
 }

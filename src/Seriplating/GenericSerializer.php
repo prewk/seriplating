@@ -48,15 +48,23 @@ class GenericSerializer implements SerializerInterface
             $serialized = [];
 
             foreach ($template as $field => $content) {
-                if (!isset($data[$field]) &&
+                if (
+                    !isset($data[$field]) &&
                     $content instanceof RuleInterface &&
-                    $content->isOptional()) {
+                    $content->isOptional()
+                ) {
                     continue;
                 } elseif (!isset($data[$field])) {
                     throw new IntegrityException("Required field '$field' missing");
-                }
+                } elseif (
+                    $content instanceof RuleInterface &&
+                    $content->isId()
+                ) {
+                    $serialized["_id"] = $this->idFactory->get($content->getValue(), $data[$field]);
+                } else {
+                    $serialized[$field] = $this->walkUnserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
 
-                $serialized[$field] = $this->walkUnserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
+                }
             }
 
             return $serialized;
