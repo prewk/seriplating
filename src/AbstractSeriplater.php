@@ -1,11 +1,11 @@
 <?php
 
-namespace Prewk\Seriplating;
+namespace Prewk;
 
 use Prewk\Seriplating\Contracts\DeserializerInterface;
 use Prewk\Seriplating\Contracts\SerializerInterface;
 
-abstract class AbstractSerializer
+abstract class AbstractSeriplater
 {
     /**
      * @var SerializerInterface
