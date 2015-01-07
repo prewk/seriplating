@@ -2,7 +2,7 @@
 
 require(__dir__ . "/../vendor/autoload.php");
 
-class TestCase extends PHPUnit_Framework_TestCase
+class SeriplatingTestCase extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {

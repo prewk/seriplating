@@ -9,7 +9,9 @@ class GenericSerializer implements SerializerInterface
 {
     public function serialize(array $template, array $toSerialize)
     {
-        return $this->walkUnserializedData($template, $toSerialize);
+        $serialized = $this->walkUnserializedData($template, $toSerialize);
+
+        return $serialized;
     }
 
     protected function mergeDotPaths($path1, $path2)
@@ -26,6 +28,8 @@ class GenericSerializer implements SerializerInterface
     private function walkUnserializedData($template, $data, $dotPath = "")
     {
         if (is_array($template)) {
+            $serialized = [];
+
             foreach ($template as $field => $content) {
                 if (!isset($data[$field]) &&
                     $content instanceof RuleInterface &&
@@ -35,10 +39,12 @@ class GenericSerializer implements SerializerInterface
                     throw new IntegrityException("Required field '$field' missing");
                 }
 
-                $this->walkUnserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
+                $serialized[$field] = $this->walkUnserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
             }
+
+            return $serialized;
         } else {
-            if ($data->isValue()) {
+            if ($template->isValue()) {
                 return $data;
             } else {
                 throw new IntegrityException("Invalid template rule");

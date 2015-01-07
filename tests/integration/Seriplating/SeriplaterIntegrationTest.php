@@ -2,10 +2,10 @@
 
 namespace Prewk\Seriplating;
 
-use TestCase;
+use SeriplatingTestCase;
 use Mockery;
 
-class SeriplaterIntegrationTest extends TestCase
+class SeriplaterIntegrationTest extends SeriplatingTestCase
 {
     private $seriplater;
 
