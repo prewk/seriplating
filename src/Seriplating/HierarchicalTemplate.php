@@ -14,6 +14,11 @@ class HierarchicalTemplate implements HierarchicalInterface
      */
     protected $templateRegistry = [];
 
+    public function __construct(
+    )
+    {
+    }
+
     public function register(BidirectionalTemplateInterface $serializer)
     {
         // Find id
@@ -45,8 +50,34 @@ class HierarchicalTemplate implements HierarchicalInterface
             throw new HierarchicalCompositionException("Entity '$entityName' wasn't found in the registry");
         }
 
-        $rootTemplate = $this->templateRegistry[$entityName];
+        // Perform serialization recursively
+        $serialization = $this->serializeRelations($this->templateRegistry[$entityName], $unserializedTree);
 
+        return $serialization;
+    }
 
+    protected function serializeRelations(BidirectionalTemplateInterface $template, array $data)
+    {
+        // Serialize this template
+        $serialization = $template->serialize($data);
+
+        // Find relations
+        foreach ($template as $field => $rule) {
+            if ($rule instanceof RuleInterface && $rule->isHasMany()) {
+                $relatedEntityName = $rule->getValue();
+
+                if (!isset($this->templateRegistry[$relatedEntityName])) {
+                    throw new HierarchicalCompositionException("Related entity '$relatedEntityName' wasn't found in the registry");
+                }
+
+                if (!isset($data[$field])) {
+                    throw new HierarchicalCompositionException("Related entity '$relatedEntityName's data didn't exist where it was expected");
+                }
+
+                $serialization[$field] = $this->serializeRelations($this->templateRegistry[$relatedEntityName], $data[$field]);
+            }
+        }
+
+        return $serialization;
     }
 }

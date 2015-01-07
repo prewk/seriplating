@@ -15,9 +15,16 @@ class HierarchicalTemplateMock extends HierarchicalTemplate
 
 class HierarchicalTemplateTest extends SeriplatingTestCase
 {
+    private $idFactory;
+
+    public function setUp()
+    {
+        $this->idFactory = new IdFactory;
+    }
+
     public function test_that_registration_adds()
     {
-        $hier = new HierarchicalTemplateMock;
+        $hier = new HierarchicalTemplateMock($this->idFactory);
         $t = new Seriplater(
             new Rule
         );
