@@ -2,10 +2,12 @@
 
 namespace Prewk;
 
+use Prewk\Seriplating\Contracts\BidirectionalTemplateInterface;
 use Prewk\Seriplating\Contracts\DeserializerInterface;
+use Prewk\Seriplating\Contracts\RepositoryInterface;
 use Prewk\Seriplating\Contracts\SerializerInterface;
 
-abstract class AbstractSeriplater
+abstract class AbstractSeriplater implements BidirectionalTemplateInterface
 {
     /**
      * @var SerializerInterface
@@ -30,11 +32,9 @@ abstract class AbstractSeriplater
         $this->genericDeserializer = $genericDeserializer;
     }
 
-    abstract protected function getTemplate();
-
     public function serialize(array $toSerialize)
     {
-        return $this->genericSerializer($this->getTemplate(), $toSerialize);
+        return $this->genericSerializer->serialize($this->getTemplate(), $toSerialize);
     }
 
 
@@ -42,5 +42,4 @@ abstract class AbstractSeriplater
     {
         return $this->genericDeserializer->deserialize($this->getTemplate(), $repository, $toUnserialize);
     }
-
 }
