@@ -2,6 +2,9 @@
 
 namespace Prewk\Seriplating;
 
+use Prewk\Seriplating\Contracts\SeriplaterInterface;
+use Prewk\Seriplating\Contracts\RuleInterface;
+
 class Seriplater implements SeriplaterInterface
 {
     const COLLECTION_OF = 1;
@@ -86,12 +89,12 @@ class Seriplater implements SeriplaterInterface
     /**
      * This field is a reference to another entity
      *
-     * @param SerializerInterface $serializer Serializer for another entity
+     * @param string $entityName Name of the entity
      * @return SeriplaterRuleInterface
      */
-    public function references(SerializerInterface $serializer)
+    public function references($entityName)
     {
-        return $this->rule->make($this->applyModifiers(self::REFERENCES), $serializer);
+        return $this->rule->make($this->applyModifiers(self::REFERENCES), $entityName);
     }
 
     /**
@@ -99,10 +102,10 @@ class Seriplater implements SeriplaterInterface
      *
      * @param string $field What field to compare against
      * @param string[] $cases Cases to compare field against
-     * @param SeriplaterRuleInterface $defaultCase An optional default case
+     * @param RuleInterface $defaultCase An optional default case
      * @return SeriplaterRuleInterface
      */
-    public function conditions($field, array $cases, SeriplaterRuleInterface $defaultCase = null)
+    public function conditions($field, array $cases, RuleInterface $defaultCase = null)
     {
         return $this->rule->make($this->applyModifiers(self::CONDITIONS), [
             "cases" => $cases,

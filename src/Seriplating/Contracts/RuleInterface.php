@@ -1,6 +1,6 @@
 <?php
 
-namespace Prewk\Seriplating;
+namespace Prewk\Seriplating\Contracts;
 
 interface RuleInterface
 {

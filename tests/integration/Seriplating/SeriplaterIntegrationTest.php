@@ -30,9 +30,7 @@ class SeriplaterIntegrationTest extends TestCase
 
     public function test_references()
     {
-        $serializer = Mockery::mock("Prewk\\Seriplating\\SerializerInterface");
-
-        $rule = $this->seriplater->references($serializer);
+        $rule = $this->seriplater->references("foo");
 
         $this->assertTrue($rule->isReference());
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Prewk\Seriplating;
+namespace Prewk\Seriplating\Contracts;
 
 interface SeriplaterInterface
 {
@@ -37,20 +37,20 @@ interface SeriplaterInterface
     /**
      * This field is a reference to another entity
      *
-     * @param SerializerInterface $serializer Serializer for another entity
+     * @param string $entityName Name of the entity
      * @return SeriplaterRuleInterface
      */
-    public function references(SerializerInterface $serializer);
+    public function references($entityName);
 
     /**
      * Treat field differently depending on the case with optional default case
      *
      * @param string $field What field to compare against
      * @param string[] $cases Cases to compare field against
-     * @param SeriplaterRuleInterface $defaultCase An optional default case
+     * @param RuleInterface $defaultCase An optional default case
      * @return SeriplaterRuleInterface
      */
-    public function conditions($field, array $cases, SeriplaterRuleInterface $defaultCase = null);
+    public function conditions($field, array $cases, RuleInterface $defaultCase = null);
 
     /**
      * Define deep rules with regular expressions using array dot notation

@@ -2,6 +2,8 @@
 
 namespace Prewk\Seriplating;
 
+use Prewk\Seriplating\Contracts\RuleInterface;
+
 class Rule implements RuleInterface
 {
     protected $type;
