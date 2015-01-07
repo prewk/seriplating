@@ -112,4 +112,48 @@ class GenericSerializerTest extends SeriplatingTestCase
 
         $this->assertEquals($expected, $serialized);
     }
+
+    public function test_conditions()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "type" => $t->value(),
+            "data" => $t->conditions("type", [
+                "foo" => $t->value(),
+                "bar" => $t->references("bars"),
+            ]),
+        ];
+        $entity1 = [
+            "type" => "foo",
+            "data" => "foo-value",
+        ];
+        $entity2 = [
+            "type" => "bar",
+            "data" => 123,
+        ];
+        $expected1 = [
+            "type" => "foo",
+            "data" => "foo-value",
+        ];
+        $expected2 = [
+            "type" => "bar",
+            "data" => ["_ref" => "bars_0"],
+        ];
+
+        $ser = new GenericSerializer($this->idFactory);
+        $serialized = $ser->serialize($template, $entity1);
+
+        $this->assertEquals($expected1, $serialized);
+
+        $this->idFactory
+            ->shouldReceive("get")
+            ->with("bars", 123)
+            ->andReturn("bars_0");
+
+        $ser = new GenericSerializer($this->idFactory);
+        $serialized = $ser->serialize($template, $entity2);
+        
+        $this->assertEquals($expected2, $serialized);
+    }
 }

@@ -15,6 +15,11 @@ class GenericSerializer implements SerializerInterface
     protected $idFactory;
 
     /**
+     * @var array
+     */
+    protected $toSerialize;
+
+    /**
      * @param IdFactoryInterface $idFactory
      */
     public function __construct(
@@ -26,6 +31,8 @@ class GenericSerializer implements SerializerInterface
 
     public function serialize(array $template, array $toSerialize)
     {
+        $this->toSerialize = $toSerialize;
+
         $serialized = $this->walkUnserializedData($template, $toSerialize);
 
         return $serialized;
@@ -83,6 +90,28 @@ class GenericSerializer implements SerializerInterface
                 } else {
                     return ["_ref" => $this->idFactory->get($template->getValue(), $data)];
                 }
+            } elseif ($template->isConditions()) {
+                $value = $template->getValue();
+                $field = $value["field"];
+                $cases = $value["cases"];
+                $defaultCase = $value["defaultCase"];
+
+                if (!isset($this->toSerialize[$field])) {
+                    throw new IntegrityException("Required conditions field '$field' missing'");
+                }
+
+                foreach ($template->getValue()["cases"] as $case => $rule) {
+                    if ($this->toSerialize[$field] == $case) {
+                        return $this->walkUnserializedData($rule, $data, $dotPath);
+                    }
+                }
+
+                if (is_null($defaultCase)) {
+                    throw new IntegrityException("No conditions matched, and no default case provided");
+                } else {
+                    return $this->walkUnserializedData($rule, $data, $dotPath);
+                }
+
             } else {
                 throw new IntegrityException("Invalid template rule");
             }

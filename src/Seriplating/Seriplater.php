@@ -108,6 +108,7 @@ class Seriplater implements SeriplaterInterface
     public function conditions($field, array $cases, RuleInterface $defaultCase = null)
     {
         return $this->rule->make($this->applyModifiers(self::CONDITIONS), [
+            "field" => $field,
             "cases" => $cases,
             "defaultCase" => $defaultCase,
         ]);
