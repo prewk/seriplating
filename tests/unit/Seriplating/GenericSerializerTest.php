@@ -48,18 +48,35 @@ class GenericSerializerTest extends SeriplatingTestCase
 
         $template = [
             "foo_id" => $t->references("foos"),
+            "bar_ids" => $t->collectionOf()->references("bars"),
         ];
         $entity = [
             "foo_id" => 123,
+            "bar_ids" => [1, 2, 3],
         ];
         $expected = [
             "foo_id" => ["_ref" => "foos_0"],
+            "bar_ids" => [
+                ["_ref" => "bars_0"],
+                ["_ref" => "bars_1"],
+                ["_ref" => "bars_2"],
+            ]
         ];
 
         $this->idFactory
             ->shouldReceive("get")
             ->with("foos", 123)
-            ->andReturn("foos_0");
+            ->andReturn("foos_0")
+
+            ->shouldReceive("get")
+            ->with("bars", 1)
+            ->andReturn("bars_0")
+            ->shouldReceive("get")
+            ->with("bars", 2)
+            ->andReturn("bars_1")
+            ->shouldReceive("get")
+            ->with("bars", 3)
+            ->andReturn("bars_2");
 
         $ser = new GenericSerializer($this->idFactory);
         $serialized = $ser->serialize($template, $entity);

@@ -64,7 +64,17 @@ class GenericSerializer implements SerializerInterface
             if ($template->isValue()) {
                 return $data;
             } elseif ($template->isReference()) {
-                return ["_ref" => $this->idFactory->get($template->getValue(), $data)];
+                if ($template->isCollection()) {
+                    $refs = [];
+
+                    foreach ($data as $dbId) {
+                        $refs[] = ["_ref" => $this->idFactory->get($template->getValue(), $dbId)];
+                    }
+
+                    return $refs;
+                } else {
+                    return ["_ref" => $this->idFactory->get($template->getValue(), $data)];
+                }
             } else {
                 throw new IntegrityException("Invalid template rule");
             }
