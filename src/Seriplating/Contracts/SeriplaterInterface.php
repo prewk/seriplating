@@ -63,7 +63,8 @@ interface SeriplaterInterface
     /**
      * Define a relation for use in a hierarchical manner
      *
+     * @param string $entityName Name of related entity
      * @return SeriplaterRuleInterface
      */
-    public function hasMany();
+    public function hasMany($entityName);
 }

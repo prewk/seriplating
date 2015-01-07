@@ -130,11 +130,12 @@ class Seriplater implements SeriplaterInterface
     /**
      * Define a relation for use in a hierarchical manner
      *
+     * @param string $entityName Name of related entity
      * @return SeriplaterRuleInterface
      */
-    public function hasMany()
+    public function hasMany($entityName)
     {
-        return $this->rule->make(self::HAS_MANY);
+        return $this->rule->make(self::HAS_MANY, $entityName);
     }
 }
 
