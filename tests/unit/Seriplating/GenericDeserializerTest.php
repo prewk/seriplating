@@ -61,6 +61,38 @@ class GenericDeserializerTest extends SeriplatingTestCase
         $this->assertEquals($expectedEntityData, $entityData);
     }
 
+    public function test_has_many()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "foo" => $t->value(),
+            "bar" => $t->hasMany("bars"),
+        ];
+        $serialized = [
+            "foo" => "bar",
+        ];
+        $expected = [
+            "foo" => "bar",
+        ];
+        $id = 123;
+        $expectedEntityData = [
+            "id" => 123,
+            "foo" => "bar",
+        ];
+
+        $this->repository
+            ->shouldReceive("create")
+            ->once()
+            ->with($expected)
+            ->andReturn($expectedEntityData);
+
+        $deser = new GenericDeserializer($this->idResolver);
+        $entityData = $deser->deserialize($template, $this->repository, $serialized);
+
+        $this->assertEquals($expectedEntityData, $entityData);
+    }
+
     public function test_id()
     {
         $t = $this->seriplater;

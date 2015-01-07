@@ -94,6 +94,11 @@ class GenericDeserializer implements DeserializerInterface
                     $this->idName = $data["_id"];
                     continue;
                 } elseif (
+                    $content instanceof RuleInterface &&
+                    $content->isHasMany()
+                ) {
+                    continue;
+                } elseif (
                     !isset($data[$field]) &&
                     $content instanceof RuleInterface &&
                     $content->isOptional()
