@@ -17,7 +17,7 @@ interface IdResolverInterface
     /**
      * Save an/several encountered reference(s) for later resolution
      *
-     * @param int|int[] $internalId The internal id reference or an array of internal id references
+     * @param string|string[] $internalId The internal id reference or an array of internal id references
      * @param callable $updateHandler A callable with which to perform the update
      * @return void
      */

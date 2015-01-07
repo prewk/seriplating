@@ -1,6 +1,8 @@
 <?php
 
-namespace Prewk\Seriplating\Contracts;
+namespace Prewk\Seriplating;
+
+use Prewk\Seriplating\Contracts\IdResolverInterface;
 
 /**
  * Collects references to internal ids in a deserialization to connect them together after creation
@@ -42,7 +44,7 @@ class IdResolver implements IdResolverInterface
     /**
      * Save an/several encountered reference(s) for later resolution
      *
-     * @param int|int[] $internalId The internal id reference or an array of internal id references
+     * @param string|string[] $internalId The internal id reference or an array of internal id references
      * @param callable $updateHandler A callable with which to perform the update
      * @return void
      */
