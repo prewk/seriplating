@@ -131,4 +131,70 @@ class GenericDeserializerTest extends SeriplatingTestCase
 
         $this->assertEquals($expectedEntityData, $entityData);
     }
+
+    public function test_conditions()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "type" => $t->value(),
+            "data" => $t->conditions("type", [
+                "foo" => $t->value(),
+                "bar" => $t->references("bars"),
+            ]),
+        ];
+        $serialized1 = [
+            "type" => "foo",
+            "data" => "foo-value",
+        ];
+        $serialized2 = [
+            "type" => "bar",
+            "data" => ["_ref" => "bars_0"],
+        ];
+        $expected1 = [
+            "type" => "foo",
+            "data" => "foo-value",
+        ];
+        $expectedEntityData1 = [
+            "id" => 123,
+            "type" => "foo",
+            "data" => "foo-value",
+        ];
+        $expected2 = [
+            "type" => "bar",
+            "data" => 0,
+        ];
+        $expectedEntityData2 = [
+            "id" => 456,
+            "type" => "bar",
+            "data" => 0,
+        ];
+
+        $this->repository
+            ->shouldReceive("create")
+            ->once()
+            ->with($expected1)
+            ->andReturn($expectedEntityData1);
+
+        $deser = new GenericDeserializer($this->idResolver);
+        $entityData = $deser->deserialize($template, $this->repository, $serialized1);
+
+        $this->assertEquals($expectedEntityData1, $entityData);
+
+        $this->repository
+            ->shouldReceive("create")
+            ->once()
+            ->with($expected2)
+            ->andReturn($expectedEntityData2);
+
+        $this->idResolver
+            ->shouldReceive("deferResolution")
+            ->once()
+            ->with("bars_0", Mockery::any());
+
+        $deser = new GenericDeserializer($this->idResolver);
+        $entityData = $deser->deserialize($template, $this->repository, $serialized2);
+
+        $this->assertEquals($expectedEntityData2, $entityData);
+    }
 }

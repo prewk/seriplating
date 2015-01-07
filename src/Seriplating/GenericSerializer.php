@@ -101,7 +101,7 @@ class GenericSerializer implements SerializerInterface
                     throw new IntegrityException("Required conditions field '$field' missing'");
                 }
 
-                foreach ($template->getValue()["cases"] as $case => $rule) {
+                foreach ($cases as $case => $rule) {
                     if ($this->toSerialize[$field] == $case) {
                         return $this->walkUnserializedData($rule, $data, $dotPath);
                     }

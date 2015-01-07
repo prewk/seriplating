@@ -17,6 +17,11 @@ class GenericDeserializer implements DeserializerInterface
     protected $idResolver;
 
     /**
+     * @var array
+     */
+    protected $toUnserialize;
+
+    /**
      * @var string
      */
     protected $idName;
@@ -38,6 +43,8 @@ class GenericDeserializer implements DeserializerInterface
 
     public function deserialize(array $template, RepositoryInterface $repository, array $toUnserialize, $primaryKeyField = "id")
     {
+        $this->toUnserialize = $toUnserialize;
+
         $entityData = $this->walkDeserializedData($template, $toUnserialize);
 
         $createdEntity = $repository->create($entityData);
@@ -115,6 +122,27 @@ class GenericDeserializer implements DeserializerInterface
                 ];
 
                 return 0;
+            } elseif ($template->isConditions()) {
+                $value = $template->getValue();
+                $field = $value["field"];
+                $cases = $value["cases"];
+                $defaultCase = $value["defaultCase"];
+
+                if (!isset($this->toUnserialize[$field])) {
+                    throw new IntegrityException("Required conditions field '$field' missing'");
+                }
+
+                foreach ($cases as $case => $rule) {
+                    if ($this->toUnserialize[$field] == $case) {
+                        return $this->walkDeserializedData($rule, $data, $dotPath);
+                    }
+                }
+
+                if (is_null($defaultCase)) {
+                    throw new IntegrityException("No conditions matched, and no default case provided");
+                } else {
+                    return $this->walkDeserializedData($rule, $data, $dotPath);
+                }
             } else {
                 throw new IntegrityException("Invalid template rule");
             }
