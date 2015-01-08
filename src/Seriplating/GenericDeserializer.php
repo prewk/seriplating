@@ -9,6 +9,9 @@ use Prewk\Seriplating\Contracts\RepositoryInterface;
 use Prewk\Seriplating\Contracts\RuleInterface;
 use Prewk\Seriplating\Errors\IntegrityException;
 
+/**
+ * A generic deserializer implementation
+ */
 class GenericDeserializer implements DeserializerInterface
 {
     /**

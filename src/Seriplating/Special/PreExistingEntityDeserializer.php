@@ -28,16 +28,26 @@ class PreExistingEntityDeserializer implements DeserializerInterface
         $this->idResolver = $idResolver;
     }
 
-    public function deserialize(array $template, RepositoryInterface $repository, array $toUnserialize, array $inherited = [], $primaryKeyField = "id")
+    /**
+     * Deserialize according to the rules set up in the template into the repository
+     *
+     * @param array $template Seriplater template
+     * @param RepositoryInterface $repository Target repository
+     * @param array $toDeserialize Serialized data
+     * @param array $inherited Inherited data from a parent entity
+     * @param string $primaryKeyField Name of primary key field
+     * @return array The created entity
+     */
+    public function deserialize(array $template, RepositoryInterface $repository, array $toDeserialize, array $inherited = [], $primaryKeyField = "id")
     {
         foreach ($template as $field => $rule) {
             if (
                 $rule instanceof RuleInterface &&
                 $rule->isId() &&
-                isset($toUnserialize["_id"]) &&
-                isset($toUnserialize[$primaryKeyField])
+                isset($toDeserialize["_id"]) &&
+                isset($toDeserialize[$primaryKeyField])
             ) {
-                $this->idResolver->bind($toUnserialize["_id"], $toUnserialize[$primaryKeyField]);
+                $this->idResolver->bind($toDeserialize["_id"], $toDeserialize[$primaryKeyField]);
             }
         }
     }
