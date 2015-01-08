@@ -63,13 +63,13 @@ class GenericSerializer implements SerializerInterface
                     $content->isInherited()
                 ) {
                     continue;
-                } elseif (!isset($data[$field])) {
-                    throw new IntegrityException("Required field '$field' missing");
                 } elseif (
                     $content instanceof RuleInterface &&
                     $content->isId()
                 ) {
                     $serialized["_id"] = $this->idFactory->get($content->getValue(), $data[$field]);
+                } elseif (!isset($data[$field])) {
+                    throw new IntegrityException("Required field '$field' missing");
                 } else {
                     $serialized[$field] = $this->walkUnserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
 

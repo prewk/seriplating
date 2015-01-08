@@ -20,6 +20,11 @@ class SeriplatingTemplate implements BidirectionalTemplateInterface
     protected $genericDeserializer;
 
     /**
+     * @var RepositoryInterface
+     */
+    protected $repository;
+
+    /**
      * @var array
      */
     protected $template;
@@ -27,16 +32,19 @@ class SeriplatingTemplate implements BidirectionalTemplateInterface
     /**
      * @param SerializerInterface $genericSerializer
      * @param DeserializerInterface $genericDeserializer
+     * @param RepositoryInterface $repository
      * @param array $template
      */
     public function __construct(
         SerializerInterface $genericSerializer,
         DeserializerInterface $genericDeserializer,
+        RepositoryInterface $repository,
         array $template
     )
     {
         $this->genericSerializer = $genericSerializer;
         $this->genericDeserializer = $genericDeserializer;
+        $this->repository = $repository;
         $this->template = $template;
     }
 
@@ -50,8 +58,8 @@ class SeriplatingTemplate implements BidirectionalTemplateInterface
         return $this->genericSerializer->serialize($this->getTemplate(), $toSerialize);
     }
 
-    public function deserialize(RepositoryInterface $repository, array $toUnserialize, array $inherited = [])
+    public function deserialize(array $toUnserialize, array $inherited = [])
     {
-        return $this->genericDeserializer->deserialize($this->getTemplate(), $repository, $toUnserialize, $inherited);
+        return $this->genericDeserializer->deserialize($this->getTemplate(), $this->repository, $toUnserialize, $inherited);
     }
 }

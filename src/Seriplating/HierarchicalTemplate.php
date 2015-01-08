@@ -1,6 +1,6 @@
 <?php
 
-namespace Prewk;
+namespace Prewk\Seriplating;
 
 use Prewk\Seriplating\Contracts\BidirectionalTemplateInterface;
 use Prewk\Seriplating\Contracts\HierarchicalInterface;
@@ -73,7 +73,7 @@ class HierarchicalTemplate implements HierarchicalInterface
         $serialization = $template->serialize($data);
 
         // Find relations
-        foreach ($template as $field => $rule) {
+        foreach ($template->getTemplate() as $field => $rule) {
             if ($rule instanceof RuleInterface && $rule->isHasMany()) {
                 $relatedEntityName = $rule->getValue();
 
@@ -85,7 +85,11 @@ class HierarchicalTemplate implements HierarchicalInterface
                     throw new HierarchicalCompositionException("Related entity '$relatedEntityName's data didn't exist where it was expected");
                 }
 
-                $serialization[$field] = $this->serializeRelations($this->templateRegistry[$relatedEntityName], $data[$field]);
+                // Serialize the relations one-by-one
+                $serialization[$field] = [];
+                foreach ($data[$field] as $child) {
+                    $serialization[$field][] = $this->serializeRelations($this->templateRegistry[$relatedEntityName], $child);
+                }
             }
         }
 

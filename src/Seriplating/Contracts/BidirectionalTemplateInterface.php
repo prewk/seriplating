@@ -8,5 +8,5 @@ interface BidirectionalTemplateInterface
 
     public function serialize(array $toSerialize);
 
-    public function deserialize(RepositoryInterface $repository, array $toUnserialize, array $inherited = []);
+    public function deserialize(array $toUnserialize, array $inherited = []);
 }

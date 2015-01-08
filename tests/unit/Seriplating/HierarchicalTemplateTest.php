@@ -1,6 +1,6 @@
 <?php
 
-namespace Prewk;
+namespace Prewk\Seriplating;
 
 use SeriplatingTestCase;
 use Mockery;
