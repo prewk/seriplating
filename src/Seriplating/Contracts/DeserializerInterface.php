@@ -4,5 +4,5 @@ namespace Prewk\Seriplating\Contracts;
 
 interface DeserializerInterface
 {
-    public function deserialize(array $template, RepositoryInterface $repository, array $toUnserialize, $primaryKeyField = "id");
+    public function deserialize(array $template, RepositoryInterface $repository, array $toUnserialize, array $inherited = [], $primaryKeyField = "id");
 }

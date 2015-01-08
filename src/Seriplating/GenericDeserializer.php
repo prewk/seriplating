@@ -32,6 +32,11 @@ class GenericDeserializer implements DeserializerInterface
     protected $updatesToDefer = [];
 
     /**
+     * @var array
+     */
+    protected $inherited;
+
+    /**
      * @param IdResolverInterface $idResolver
      */
     public function __construct(
@@ -41,9 +46,10 @@ class GenericDeserializer implements DeserializerInterface
         $this->idResolver = $idResolver;
     }
 
-    public function deserialize(array $template, RepositoryInterface $repository, array $toUnserialize, $primaryKeyField = "id")
+    public function deserialize(array $template, RepositoryInterface $repository, array $toUnserialize, array $inherited = [], $primaryKeyField = "id")
     {
         $this->toUnserialize = $toUnserialize;
+        $this->inherited = $inherited;
 
         $entityData = $this->walkDeserializedData($template, $toUnserialize);
 
@@ -97,6 +103,17 @@ class GenericDeserializer implements DeserializerInterface
                     $content instanceof RuleInterface &&
                     $content->isHasMany()
                 ) {
+                    continue;
+                } elseif (
+                    $content instanceof RuleInterface &&
+                    $content->isInherited()
+                ) {
+                    $fieldToInherit = $content->getValue();
+                    if (!isset($this->inherited[$fieldToInherit])) {
+                        throw new IntegrityException("Required inherited '$field' wasn't supplied");
+                    }
+
+                    $entityData[$field] = $this->inherited[$fieldToInherit];
                     continue;
                 } elseif (
                     !isset($data[$field]) &&
