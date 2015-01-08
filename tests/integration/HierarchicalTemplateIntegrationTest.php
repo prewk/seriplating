@@ -64,18 +64,18 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
         ];
 
         $expected = [
-            "_id" => "tops_0",
+            "_id" => $idFactory->get("tops", 1),
             "val" => "lorem",
             "foos" => [
-                ["_id" => "foos_1", "val" => "ipsum"],
-                ["_id" => "foos_2", "val" => "foo"],
+                ["_id" => $idFactory->get("foos", 2), "val" => "ipsum"],
+                ["_id" => $idFactory->get("foos", 3), "val" => "foo"],
             ],
             "bars" => [
                 [
-                    "_id" => "bars_3",
+                    "_id" => $idFactory->get("bars", 4),
                     "val" => "bar",
                     "bazes" => [
-                        ["_id" => "bazes_4", "val" => "baz"],
+                        ["_id" => $idFactory->get("bazes", 5), "val" => "baz"],
                     ],
                 ]
             ],
@@ -86,5 +86,9 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
             ->register($fooTemplate)
             ->register($barTemplate)
             ->register($bazTemplate);
+
+        $serialization = $hier->serialize("tops", $data);
+
+        $this->assertEquals($expected, $serialization);
     }
 }
