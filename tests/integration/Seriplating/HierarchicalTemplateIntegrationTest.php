@@ -128,6 +128,7 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
             "val" => $t->value(),
             "bar_id" => $t->inherits("id"),
             "top_id" => $t->inherits("top_id"),
+            "foo_id" => $t->references("foos"),
         ]);
 
         $serialization = [
@@ -142,7 +143,7 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
                     "_id" => $idFactory->get("bars", 4),
                     "val" => "bar",
                     "bazes" => [
-                        ["_id" => $idFactory->get("bazes", 5), "val" => "baz"],
+                        ["_id" => $idFactory->get("bazes", 5), "val" => "baz", "foo_id" => ["_ref" => $idFactory->get("foos", 2)]],
                     ],
                 ]
             ],
@@ -160,7 +161,7 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
                     "id" => 4,
                     "val" => "bar",
                     "bazes" => [
-                        ["id" => 5, "val" => "baz", "top_id" => 1, "bar_id" => 4],
+                        ["id" => 5, "val" => "baz", "top_id" => 1, "bar_id" => 4, "foo_id" => 0],
                     ],
                     "top_id" => 1,
                 ]
@@ -222,13 +223,18 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
                 "val" => "baz",
                 "top_id" => 1,
                 "bar_id" => 4,
+                "foo_id" => 0,
             ])
             ->andReturn([
                 "id" => 5,
                 "val" => "baz",
                 "top_id" => 1,
                 "bar_id" => 4,
-            ]);
+                "foo_id" => 0,
+            ])
+            ->shouldReceive("update")
+            ->once()
+            ->with(5, "foo_id", 2);
 
         $hier
             ->register($topTemplate)
