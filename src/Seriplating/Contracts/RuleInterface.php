@@ -51,4 +51,9 @@ interface RuleInterface
      * @return bool
      */
     public function isHasMany();
+
+    /**
+     * @return bool
+     */
+    public function isInherited();
 }

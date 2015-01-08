@@ -16,6 +16,7 @@ class Seriplater implements SeriplaterInterface
     const CONDITIONS = 32;
     const DEEP = 64;
     const HAS_MANY = 128;
+    const INHERITS = 256;
 
     protected $rule;
 
@@ -136,6 +137,17 @@ class Seriplater implements SeriplaterInterface
     public function hasMany($entityName)
     {
         return $this->rule->make(self::HAS_MANY, $entityName);
+    }
+
+    /**
+     * Field passed from parent above
+     *
+     * @param string $field Field to inherit
+     * @return SeriplaterRuleInterface
+     */
+    public function inherits($field)
+    {
+        return $this->rule->make(self::INHERITS, $field);
     }
 }
 

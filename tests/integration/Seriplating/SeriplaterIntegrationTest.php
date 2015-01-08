@@ -73,4 +73,11 @@ class SeriplaterIntegrationTest extends SeriplatingTestCase
 
         $this->assertTrue($rule->isHasMany());
     }
+
+    public function test_inherits()
+    {
+        $rule = $this->seriplater->inherits("foos");
+
+        $this->assertTrue($rule->isInherited());
+    }
 }

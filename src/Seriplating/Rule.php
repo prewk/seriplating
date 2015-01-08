@@ -101,4 +101,12 @@ class Rule implements RuleInterface
     {
         return (Seriplater::HAS_MANY & $this->type) !== 0;
     }
+
+    /**
+     * @return bool
+     */
+    public function isInherited()
+    {
+        return (Seriplater::INHERITS & $this->type) !== 0;
+    }
 }

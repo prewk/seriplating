@@ -67,4 +67,12 @@ interface SeriplaterInterface
      * @return SeriplaterRuleInterface
      */
     public function hasMany($entityName);
+
+    /**
+     * Field passed from parent above
+     *
+     * @param string $field Field to inherit
+     * @return SeriplaterRuleInterface
+     */
+    public function inherits($field);
 }
