@@ -244,12 +244,6 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
 
         $entityData = $hier->deserialize("tops", $serialization);
 
-//        echo "##### ACTUAL #######\n";
-//        print_r($entityData);
-
-//        echo "########## EXPECTED #########\n";
-//        print_r($expectedCreatedEntityData);
-
         $this->assertEquals($expectedCreatedEntityData, $entityData);
    }
 }
