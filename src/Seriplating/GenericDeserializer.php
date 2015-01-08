@@ -160,11 +160,7 @@ class GenericDeserializer implements DeserializerInterface
                 $dotParts = explode(".", $dotPath);
 
                 $this->updatesToDefer[] = [
-                    "targetField" => $dotParts[0],
-                    "entityName" => $template->getValue(),
                     "internalId" => $data["_ref"],
-                    "overwriteField" => count($dotParts) === 1,
-                    "dotPath" => (count($dotParts) === 1) ? null : substr($dotPath, strlen($dotParts[0]) + 1),
                     "fullDotPath" => $dotPath,
                 ];
 
