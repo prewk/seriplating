@@ -7,29 +7,42 @@ use Prewk\Seriplating\Contracts\DeserializerInterface;
 use Prewk\Seriplating\Contracts\RepositoryInterface;
 use Prewk\Seriplating\Contracts\SerializerInterface;
 
-abstract class AbstractSeriplater implements BidirectionalTemplateInterface
+class SeriplatingTemplate implements BidirectionalTemplateInterface
 {
     /**
      * @var SerializerInterface
      */
-    private $genericSerializer;
+    protected $genericSerializer;
 
     /**
      * @var DeserializerInterface
      */
-    private $genericDeserializer;
+    protected $genericDeserializer;
+
+    /**
+     * @var array
+     */
+    protected $template;
 
     /**
      * @param SerializerInterface $genericSerializer
      * @param DeserializerInterface $genericDeserializer
+     * @param array $template
      */
     public function __construct(
         SerializerInterface $genericSerializer,
-        DeserializerInterface $genericDeserializer
+        DeserializerInterface $genericDeserializer,
+        array $template
     )
     {
         $this->genericSerializer = $genericSerializer;
         $this->genericDeserializer = $genericDeserializer;
+        $this->template = $template;
+    }
+
+    public function getTemplate()
+    {
+        return $this->template;
     }
 
     public function serialize(array $toSerialize)
@@ -37,9 +50,8 @@ abstract class AbstractSeriplater implements BidirectionalTemplateInterface
         return $this->genericSerializer->serialize($this->getTemplate(), $toSerialize);
     }
 
-
-    public function deserialize(RepositoryInterface $repository, array $toUnserialize)
+    public function deserialize(RepositoryInterface $repository, array $toUnserialize, array $inherited = [])
     {
-        return $this->genericDeserializer->deserialize($this->getTemplate(), $repository, $toUnserialize);
+        return $this->genericDeserializer->deserialize($this->getTemplate(), $repository, $toUnserialize, $inherited);
     }
 }

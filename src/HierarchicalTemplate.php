@@ -1,6 +1,6 @@
 <?php
 
-namespace Prewk\Seriplating;
+namespace Prewk;
 
 use Prewk\Seriplating\Contracts\BidirectionalTemplateInterface;
 use Prewk\Seriplating\Contracts\HierarchicalInterface;
