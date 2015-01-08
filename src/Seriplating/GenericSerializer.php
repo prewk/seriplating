@@ -59,7 +59,8 @@ class GenericSerializer implements SerializerInterface
                 if (
                     $content instanceof RuleInterface &&
                     (!isset($data[$field]) && $content->isOptional()) ||
-                    $content->isHasMany()
+                    $content->isHasMany() ||
+                    $content->isInherited()
                 ) {
                     continue;
                 } elseif (!isset($data[$field])) {
