@@ -95,4 +95,48 @@ class HierarchicalTemplate implements HierarchicalInterface
 
         return $serialization;
     }
+
+    public function deserialize($entityName, array $serializedTree)
+    {
+        if (!isset($this->templateRegistry[$entityName])) {
+            throw new HierarchicalCompositionException("Entity '$entityName' wasn't found in the registry");
+        }
+
+        // Perform deserialization recursively
+        $entityData = $this->deserializeRelations($this->templateRegistry[$entityName], $serializedTree);
+
+        // Resolve deferred updates
+        $this->idResolver->resolve();
+
+        return $entityData;
+    }
+
+    protected function deserializeRelations(BidirectionalTemplateInterface $template, array $data, array $inherited = [])
+    {
+        // Deserialize this template
+        $entityData = $template->deserialize($data, $inherited);
+
+        // Find relations
+        foreach ($template->getTemplate() as $field => $rule) {
+            if ($rule instanceof RuleInterface && $rule->isHasMany()) {
+                $relatedEntityName = $rule->getValue();
+
+                if (!isset($this->templateRegistry[$relatedEntityName])) {
+                    throw new HierarchicalCompositionException("Related entity '$relatedEntityName' wasn't found in the registry");
+                }
+
+                if (!isset($data[$field])) {
+                    throw new HierarchicalCompositionException("Related entity '$relatedEntityName's data didn't exist where it was expected");
+                }
+
+                // Deserialize the relations one-by-one
+                $entityData[$field] = [];
+                foreach ($data[$field] as $child) {
+                    $entityData[$field][] = $this->deserializeRelations($this->templateRegistry[$relatedEntityName], $child, $entityData);
+                }
+            }
+        }
+
+        return $entityData;
+    }
 }
