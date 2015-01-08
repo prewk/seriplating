@@ -16,11 +16,11 @@ interface RepositoryInterface
     public function create(array $data);
 
     /**
-     * Update an entity's field
+     * Update an entity's fields
      *
      * @param mixed $id The primary key of the entity
-     * @param string $field Field to update
-     * @param mixed $data Data to update with
+     * @param array $data Fields and their data
+     * @return array The updated entity
      */
-    public function update($id, $field, $data);
+    public function update($id, array $data);
 }

@@ -190,9 +190,9 @@ class GenericDeserializerTest extends SeriplatingTestCase
             ->andReturn($expectedEntityData);
 
         $this->idResolver
-            ->shouldReceive("deferResolution")
+            ->shouldReceive("defer")
             ->once()
-            ->with("foos_0", Mockery::any());
+            ->with("foos_0", $this->repository, 123, "foo_id", $expectedEntityData);
 
         $deser = new GenericDeserializer($this->idResolver);
         $entityData = $deser->deserialize($template, $this->repository, $serialized);
@@ -256,9 +256,9 @@ class GenericDeserializerTest extends SeriplatingTestCase
             ->andReturn($expectedEntityData2);
 
         $this->idResolver
-            ->shouldReceive("deferResolution")
+            ->shouldReceive("defer")
             ->once()
-            ->with("bars_0", Mockery::any());
+            ->with("bars_0", $this->repository, 456, "data", $expectedEntityData2);
 
         $deser = new GenericDeserializer($this->idResolver);
         $entityData = $deser->deserialize($template, $this->repository, $serialized2);
@@ -363,25 +363,25 @@ class GenericDeserializerTest extends SeriplatingTestCase
         ];
 
         $this->idResolver
-            ->shouldReceive("deferResolution")
+            ->shouldReceive("defer")
             ->once()
-            ->with("blocks_0", Mockery::any())
-            ->shouldReceive("deferResolution")
+            ->with("blocks_0", $this->repository, 123, "data.rows.0.columns.0.blocks.0.id", $expectedEntityData)
+            ->shouldReceive("defer")
             ->once()
-            ->with("blocks_1", Mockery::any())
-            ->shouldReceive("deferResolution")
+            ->with("blocks_1", $this->repository, 123, "data.rows.0.columns.0.blocks.1.id", $expectedEntityData)
+            ->shouldReceive("defer")
             ->once()
-            ->with("blocks_2", Mockery::any())
-            ->shouldReceive("deferResolution")
+            ->with("blocks_2", $this->repository, 123, "data.rows.0.columns.1.blocks.0.id", $expectedEntityData)
+            ->shouldReceive("defer")
             ->once()
-            ->with("blocks_3", Mockery::any())
+            ->with("blocks_3", $this->repository, 123, "data.rows.0.columns.1.blocks.1.id", $expectedEntityData)
 
-            ->shouldReceive("deferResolution")
+            ->shouldReceive("defer")
             ->once()
-            ->with("resources_0", Mockery::any())
-            ->shouldReceive("deferResolution")
+            ->with("resources_0", $this->repository, 123, "data.resources.0.id", $expectedEntityData)
+            ->shouldReceive("defer")
             ->once()
-            ->with("resources_1", Mockery::any());
+            ->with("resources_1", $this->repository, 123, "data.resources.1.id", $expectedEntityData);
 
         $this->repository
             ->shouldReceive("create")

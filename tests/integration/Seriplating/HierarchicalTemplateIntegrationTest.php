@@ -234,7 +234,9 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
             ])
             ->shouldReceive("update")
             ->once()
-            ->with(5, "foo_id", 2);
+            ->with(5, [
+                "foo_id" => 2
+            ]);
 
         $hier
             ->register($topTemplate)

@@ -24,6 +24,18 @@ interface IdResolverInterface
     public function deferResolution($internalId, callable $updateHandler);
 
     /**
+     * Save an encountered reference for later resolution
+     *
+     * @param mixed $internalId The internal id reference dependency needed to resolve
+     * @param RepositoryInterface $repository Target repository
+     * @param mixed $primaryKey Primary key used for updating the repository
+     * @param string $field Field, in dot notation, to receive the update
+     * @param array $initialEntityData Initial entity data used to not overwrite "deep" fields
+     * @return void
+     */
+    public function defer($internalId, RepositoryInterface $repository, $primaryKey, $field, $initialEntityData = []);
+
+    /**
      * Resolve the saved encountered references by performing the deferred updates
      *
      * @throws DataIntegrityException if an internal id couldn't be resolved

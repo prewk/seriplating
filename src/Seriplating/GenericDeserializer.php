@@ -61,30 +61,27 @@ class GenericDeserializer implements DeserializerInterface
      */
     public function deserialize(array $template, RepositoryInterface $repository, array $toDeserialize, array $inherited = [], $primaryKeyField = "id")
     {
+        // Save these for some special use in the recursive walk
         $this->toUnserialize = $toDeserialize;
         $this->inherited = $inherited;
 
+        // Recurse the template and data
         $entityData = $this->walkDeserializedData($template, $toDeserialize);
 
+        // Create the entity via the repository
         $createdEntity = $repository->create($entityData);
         $primaryKey = $createdEntity[$primaryKeyField];
 
+        // Was an internal id to this entity caught?
         if (isset($this->idName)) {
+            // Bind the internal id to the real created id
             $this->idResolver->bind($this->idName, $primaryKey);
         }
 
-        foreach ($this->updatesToDefer as $updateToDefer) {
-            $this->idResolver->deferResolution($updateToDefer["internalId"], function($dbId) use ($repository, $updateToDefer, $primaryKey, $createdEntity) {
-                if ($updateToDefer["overwriteField"]) {
-                    $repository->update($primaryKey, $updateToDefer["targetField"], $dbId);
-                } else {
-                    $newFieldData = $createdEntity[$updateToDefer["targetField"]];
-                    Arr::set($newFieldData, $updateToDefer["dotPath"], $dbId);
-                    $repository->update($primaryKey, $updateToDefer["targetField"], $newFieldData);
-                }
-            });
-        }
+        // Optimize and defer updates to be performed at a later time
+        $this->deferUpdates($repository, $primaryKey, $createdEntity);
 
+        // Return the created entity
         return $createdEntity;
     }
 
@@ -167,7 +164,8 @@ class GenericDeserializer implements DeserializerInterface
                     "entityName" => $template->getValue(),
                     "internalId" => $data["_ref"],
                     "overwriteField" => count($dotParts) === 1,
-                    "dotPath" => (count($dotParts) === 1) ? null : substr($dotPath, strlen($dotParts[0] + 1)),
+                    "dotPath" => (count($dotParts) === 1) ? null : substr($dotPath, strlen($dotParts[0]) + 1),
+                    "fullDotPath" => $dotPath,
                 ];
 
                 return 0;
@@ -216,6 +214,20 @@ class GenericDeserializer implements DeserializerInterface
             } else {
                 throw new IntegrityException("Invalid template rule");
             }
+        }
+    }
+
+    /**
+     * Tell the id resolver to defer our caught updates until they can be resolved
+     *
+     * @param RepositoryInterface $repository Target repository
+     * @param mixed $primaryKey Primary key of the created entity
+     * @param array $createdEntity The created entity
+     */
+    protected function deferUpdates(RepositoryInterface $repository, $primaryKey, array $createdEntity)
+    {
+        foreach ($this->updatesToDefer as $updateToDefer) {
+            $this->idResolver->defer($updateToDefer["internalId"], $repository, $primaryKey, $updateToDefer["fullDotPath"], $createdEntity);
         }
     }
 }
