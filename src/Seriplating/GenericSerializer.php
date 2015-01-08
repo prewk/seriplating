@@ -30,6 +30,13 @@ class GenericSerializer implements SerializerInterface
         $this->idFactory = $idFactory;
     }
 
+    /**
+     * Serialize according to the rules set up in the template into an array
+     *
+     * @param array $template Seriplater template
+     * @param array $toSerialize Raw data to serialize
+     * @return array Serialized data
+     */
     public function serialize(array $template, array $toSerialize)
     {
         $this->toSerialize = $toSerialize;
@@ -39,17 +46,31 @@ class GenericSerializer implements SerializerInterface
         return $serialized;
     }
 
+    /**
+     * Merge strings with a dot
+     *
+     * @param $path1 String 1
+     * @param $path2 String 2
+     * @return string Resulting string
+     */
     protected function mergeDotPaths($path1, $path2)
     {
-        if ($path1 === "") {
-            return $path2;
-        } elseif ($path2 === "") {
-            return $path1;
+        if ($path1 === "" || $path2 === "") {
+            return $path2 . $path1;
         } else {
             return "$path1.$path2";
         }
     }
 
+    /**
+     * Go through the unserialized data recursively
+     *
+     * @param mixed $template Seriplater template/rule
+     * @param mixed $data Scope data
+     * @param string $dotPath Dot path to scope
+     * @return array Serialized results
+     * @throws IntegrityException when illegal structures or missing pieces are encountered
+     */
     private function walkUnserializedData($template, $data, $dotPath = "")
     {
         if (is_array($template)) {
