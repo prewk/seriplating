@@ -30,6 +30,12 @@ class HierarchicalTemplate implements HierarchicalInterface
         $this->idResolver = $idResolver;
     }
 
+    /**
+     * Register a bidirectional serializer with an id to be able to use it hierarchically
+     * @param BidirectionalTemplateInterface $serializer Serializer/Deserializer/Template
+     * @return HierarchicalInterface Chainable
+     * @throws HierarchicalCompositionException on structure errors or missing fields
+     */
     public function register(BidirectionalTemplateInterface $serializer)
     {
         // Find id
@@ -55,6 +61,14 @@ class HierarchicalTemplate implements HierarchicalInterface
         return $this;
     }
 
+    /**
+     * Serialize from the given (de)serializer id entity name and downwards
+     *
+     * @param string $entityName The registrered entity's name as provided via the id() rule
+     * @param array $unserializedTree Unserialized data
+     * @return array Serialized data
+     * @throws HierarchicalCompositionException on structure errors or missing fields
+     */
     public function serialize($entityName, array $unserializedTree)
     {
         if (!isset($this->templateRegistry[$entityName])) {
@@ -67,6 +81,14 @@ class HierarchicalTemplate implements HierarchicalInterface
         return $serialization;
     }
 
+    /**
+     * Serialize recursively
+     *
+     * @param BidirectionalTemplateInterface $template Serializer/Deserializer/Template
+     * @param array $data Scope data
+     * @return array Serialized data
+     * @throws HierarchicalCompositionException on structure errors or missing fields
+     */
     protected function serializeRelations(BidirectionalTemplateInterface $template, array $data)
     {
         // Serialize this template
@@ -96,6 +118,14 @@ class HierarchicalTemplate implements HierarchicalInterface
         return $serialization;
     }
 
+    /**
+     * Deserialize from the given (de)serializer id entity name and downwards
+     *
+     * @param string $entityName The registrered entity's name as provided via the id() rule
+     * @param array $serializedTree Serialized data
+     * @return Unserialized entity data
+     * @throws HierarchicalCompositionException on structure errors or missing fields
+     */
     public function deserialize($entityName, array $serializedTree)
     {
         if (!isset($this->templateRegistry[$entityName])) {
@@ -111,6 +141,14 @@ class HierarchicalTemplate implements HierarchicalInterface
         return $entityData;
     }
 
+    /**
+     * Deserialize recursively
+     *
+     * @param BidirectionalTemplateInterface $template Serializer/Deserializer/Template
+     * @param array $data Scope data
+     * @param array $inherited Inherited data
+     * @throws HierarchicalCompositionException on structure errors or missing fields
+     */
     protected function deserializeRelations(BidirectionalTemplateInterface $template, array $data, array $inherited = [])
     {
         // Deserialize this template
