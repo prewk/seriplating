@@ -2,6 +2,9 @@
 
 namespace Prewk\Seriplating\Contracts;
 
+/**
+ * Templating system for serializing database entities and their relations
+ */
 interface SeriplaterInterface
 {
     /**

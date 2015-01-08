@@ -8,6 +8,9 @@ use Prewk\Seriplating\Contracts\RuleInterface;
 use Prewk\Seriplating\Contracts\SerializerInterface;
 use Prewk\Seriplating\Errors\IntegrityException;
 
+/**
+ * A generic serializer implementation
+ */
 class GenericSerializer implements SerializerInterface
 {
     /**

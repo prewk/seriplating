@@ -7,6 +7,9 @@ use Prewk\Seriplating\Contracts\DeserializerInterface;
 use Prewk\Seriplating\Contracts\RepositoryInterface;
 use Prewk\Seriplating\Contracts\SerializerInterface;
 
+/**
+ * Provides a Seriplater template and methods for (de)serializing
+ */
 class SeriplatingTemplate implements BidirectionalTemplateInterface
 {
     /**
