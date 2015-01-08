@@ -4,7 +4,6 @@ namespace Prewk\Seriplating;
 
 use Prewk\Seriplating\Contracts\SeriplaterInterface;
 use Prewk\Seriplating\Contracts\RuleInterface;
-use Prewk\Seriplating\Contracts\SeriplaterRuleInterface;
 
 class Seriplater implements SeriplaterInterface
 {
@@ -72,7 +71,7 @@ class Seriplater implements SeriplaterInterface
      * This field is the primary key for this entity
      *
      * @param string $entityName Entity name
-     * @return SeriplaterRuleInterface
+     * @return RuleInterface
      */
     public function id($entityName)
     {
@@ -82,7 +81,7 @@ class Seriplater implements SeriplaterInterface
     /**
      * This field is a value
      *
-     * @return SeriplaterRuleInterface
+     * @return RuleInterface
      */
     public function value()
     {
@@ -93,7 +92,7 @@ class Seriplater implements SeriplaterInterface
      * This field is a reference to another entity
      *
      * @param string $entityName Name of the entity
-     * @return SeriplaterRuleInterface
+     * @return RuleInterface
      */
     public function references($entityName)
     {
@@ -106,7 +105,7 @@ class Seriplater implements SeriplaterInterface
      * @param string $field What field to compare against
      * @param string[] $cases Cases to compare field against
      * @param RuleInterface $defaultCase An optional default case
-     * @return SeriplaterRuleInterface
+     * @return RuleInterface
      */
     public function conditions($field, array $cases, RuleInterface $defaultCase = null)
     {
@@ -121,7 +120,7 @@ class Seriplater implements SeriplaterInterface
      * Define deep rules with regular expressions using array dot notation
      *
      * @param array $finders Key-value array with regexp-rule
-     * @return SeriplaterRuleInterface
+     * @return RuleInterface
      */
     public function deep(array $finders)
     {
@@ -132,7 +131,7 @@ class Seriplater implements SeriplaterInterface
      * Define a relation for use in a hierarchical manner
      *
      * @param string $entityName Name of related entity
-     * @return SeriplaterRuleInterface
+     * @return RuleInterface
      */
     public function hasMany($entityName)
     {
@@ -143,7 +142,7 @@ class Seriplater implements SeriplaterInterface
      * Field passed from parent above
      *
      * @param string $field Field to inherit
-     * @return SeriplaterRuleInterface
+     * @return RuleInterface
      */
     public function inherits($field)
     {

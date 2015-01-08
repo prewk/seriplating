@@ -156,6 +156,7 @@ class HierarchicalTemplate implements HierarchicalInterface
 
         // Find relations
         foreach ($template->getTemplate() as $field => $rule) {
+            // @TODO: Support conditions here
             if ($rule instanceof RuleInterface && $rule->isHasMany()) {
                 $relatedEntityName = $rule->getValue();
 
