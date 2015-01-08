@@ -4,28 +4,55 @@ namespace Prewk\Seriplating;
 
 use Prewk\Seriplating\Contracts\RuleInterface;
 
+/**
+ * A seriplater rule
+ */
 class Rule implements RuleInterface
 {
+    /**
+     * @var int
+     */
     protected $type;
+
+    /**
+     * @var mixed
+     */
     protected $value;
 
-    public function __construct() {}
-
+    /**
+     * Set type
+     *
+     * @param int $type Type
+     * @return RuleInterface Chainable
+     */
     public function setType($type)
     {
         $this->type = $type;
         return $this;
     }
 
+    /**
+     * Set value
+     *
+     * @param mixed $value Value
+     * @return RuleInterface Chainable
+     */
     public function setValue($value)
     {
         $this->value = $value;
         return $this;
     }
 
+    /**
+     * Rule factory
+     *
+     * @param int $type Type
+     * @param mixed $value Value
+     * @return RuleInterface A new rule
+     */
     public function make($type, $value = null)
     {
-        $product = new static();
+        $product = new static;
         $product
             ->setType($type)
             ->setValue($value);
@@ -33,6 +60,11 @@ class Rule implements RuleInterface
         return $product;
     }
 
+    /**
+     * Get value
+     *
+     * @return mixed Value
+     */
     public function getValue()
     {
         return $this->value;

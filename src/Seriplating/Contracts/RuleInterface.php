@@ -2,14 +2,41 @@
 
 namespace Prewk\Seriplating\Contracts;
 
+/**
+ * A seriplater rule
+ */
 interface RuleInterface
 {
+    /**
+     * Set type
+     *
+     * @param int $type Type
+     * @return RuleInterface Chainable
+     */
     public function setType($type);
 
+    /**
+     * Set value
+     *
+     * @param mixed $value Value
+     * @return RuleInterface Chainable
+     */
     public function setValue($value);
 
+    /**
+     * Rule factory
+     *
+     * @param int $type Type
+     * @param mixed $value Value
+     * @return RuleInterface A new rule
+     */
     public function make($type, $value = null);
 
+    /**
+     * Get value
+     *
+     * @return mixed Value
+     */
     public function getValue();
 
     /**

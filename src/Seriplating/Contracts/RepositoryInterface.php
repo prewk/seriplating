@@ -2,6 +2,9 @@
 
 namespace Prewk\Seriplating\Contracts;
 
+/**
+ * Represents a repository
+ */
 interface RepositoryInterface
 {
     /**
