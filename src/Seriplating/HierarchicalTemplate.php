@@ -159,41 +159,7 @@ class HierarchicalTemplate implements HierarchicalInterface
         // Find relations
         foreach ($template->getTemplate() as $field => $rule) {
             if ($rule instanceof RuleInterface) {
-                if ($rule->isConditions()) {
-                    // Conditions (Only supports one level)
-                    $conditions = $rule->getValue();
-                    $conditionsField = $conditions["field"];
-                    $cases = $conditions["cases"];
-                    $defaultCase = $conditions["defaultCase"];
-
-                    // Fail if the field doesn't exist at all
-                    if (!isset($data[$conditionsField])) {
-                        throw new IntegrityException("Missing field '$conditionsField' for use in conditions");
-                    }
-
-                    // Switch through cases
-                    $hasManyRuleFound = false;
-                    $caseMatch = false;
-                    foreach ($cases as $case => $rule) {
-                        if ($data[$conditionsField] == $case) {
-                            $caseMatch = true;
-                            if ($rule->isHasMany()) {
-                                $entityData[$field] = $this->handleHasManyRule($rule, $data, $field, $entityData);
-                                $hasManyRuleFound = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    // Default case
-                    if (!$caseMatch) {
-                        if (is_null($defaultCase)) {
-                            throw new IntegrityException("No conditions matched for field '$conditionsField");
-                        } elseif ($defaultCase->isHasMany()) {
-                            $entityData[$field] = $this->handleHasManyRule($rule, $data, $field, $entityData);
-                        }
-                    }
-                } elseif ($rule->isHasMany()) {
+                if ($rule->isHasMany()) {
                     $entityData[$field] = $this->handleHasManyRule($rule, $data, $field, $entityData);
                 }
             }
