@@ -428,4 +428,40 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         $this->assertEquals($serialization["tweaks"][0]["data"]["color_swatch_id"]["_ref"], $serialization["color_swatches"][0]["_id"]);
         $this->assertEquals($serialization["pages"][1]["sections"][0]["blocks"][0]["data"]["current_resource_id"]["_ref"], $serialization["pages"][1]["sections"][0]["blocks"][0]["resources"][0]["_id"]);
     }
+
+    private function deserialize()
+    {
+        // Site
+        $siteCreate = [
+            "name" => "Foo",
+            "primary_menu_id" => 0,
+            "landing_page_id" => 0,
+            "font_preset" => "sans",
+            "font_variables" => ["HEADING" => "sans"],
+        ];
+        $siteCreated = ["id" => 1] + $siteCreate;
+        $siteUpdate = [
+            "primary_menu_id" => 1,
+            "landing_page_id" => 1,
+        ];
+        $siteUpdated = array_merge($siteCreated, $siteUpdate);
+
+        $this->siteRepo->shouldReceive("create")->once()->with($siteCreate)->andReturn($siteCreated)
+            ->shouldReceive("update")->once()->with($siteUpdate)->andReturn($siteUpdated);
+
+        // Color swatch
+        $colorSwatchCreate = [
+            "site_id" => 1,
+            "value" => "#ffff00",
+        ];
+        $colorSwatchCreated = ["id" => 1] + $colorSwatchCreate;
+        $this->colorSwatchRepo->shouldReceive("create")->once()->with($colorSwatchCreate)->andReturn($colorSwatchCreated);
+
+        return $this->hier->deserialize("sites", $this->serialize());
+    }
+
+    public function test_cms_deserialization()
+    {
+        $proto = $this->deserialize();
+    }
 }

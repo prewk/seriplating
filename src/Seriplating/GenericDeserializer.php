@@ -149,7 +149,7 @@ class GenericDeserializer implements DeserializerInterface
                     foreach ($cases as $case => $rule) {
                         if ($this->toUnserialize[$conditionsField] == $case) {
                             $caseMatch = true;
-                            if ($rule->isInherited()) {
+                            if ($rule instanceof RuleInterface && $rule->isInherited()) {
                                 $fieldsToInherit = $rule->getValue();
                                 $recurseIntoRule = false;
                                 break;
