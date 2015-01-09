@@ -132,12 +132,18 @@ class GenericDeserializer implements DeserializerInterface
                     $content instanceof RuleInterface &&
                     $content->isInherited()
                 ) {
-                    $fieldToInherit = $content->getValue();
-                    if (!isset($this->inherited[$fieldToInherit])) {
-                        throw new IntegrityException("Required inherited '$field' wasn't supplied");
+                    $fieldsToInherit = $content->getValue();
+                    $foundInheritance = null;
+                    foreach ($fieldsToInherit as $fieldToInherit) {
+                        if (isset($this->inherited[$fieldToInherit])) {
+                            $foundInheritance = $this->inherited[$fieldToInherit];
+                        }
+                    }
+                    if (is_null($foundInheritance)) {
+                        throw new IntegrityException("Required inheritance to field '$field' wasn't supplied");
                     }
 
-                    $entityData[$field] = $this->inherited[$fieldToInherit];
+                    $entityData[$field] = $foundInheritance;
                     continue;
                 } elseif (
                     !isset($data[$field]) &&

@@ -101,6 +101,7 @@ class GenericDeserializerTest extends SeriplatingTestCase
             "parent_id" => $t->inherits("id"),
             "foo_id" => $t->inherits("foo_id"),
             "bar" => $t->value(),
+            "baz_id" => $t->inherits("baz_id", "foo_id"),
         ];
         $serialized = [
             "bar" => "baz",
@@ -109,12 +110,14 @@ class GenericDeserializerTest extends SeriplatingTestCase
             "parent_id" => 456,
             "foo_id" => 789,
             "bar" => "baz",
+            "baz_id" => 789,
         ];
         $expectedEntityData = [
             "id" => 123,
             "parent_id" => 456,
             "foo_id" => 789,
             "bar" => "baz",
+            "baz_id" => 789,
         ];
 
         $this->repository

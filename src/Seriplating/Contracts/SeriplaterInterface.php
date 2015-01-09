@@ -72,10 +72,10 @@ interface SeriplaterInterface
     public function hasMany($entityName);
 
     /**
-     * Field passed from parent above
+     * Field passed from parent above, arguments are a priority list starting with
+     * the most prioritized, fallbacks to the next etc
      *
-     * @param string $field Field to inherit
      * @return RuleInterface
      */
-    public function inherits($field);
+    public function inherits();
 }

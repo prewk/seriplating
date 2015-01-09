@@ -67,7 +67,8 @@ class GenericSerializerTest extends SeriplatingTestCase
 
         $template = [
             "foo" => $t->value(),
-            "bar" => $t->inherits("bars"),
+            "bar" => $t->inherits("id"),
+            "baz" => $t->inherits("id", "baz_id"),
         ];
         $entity = [
             "foo" => "bar",

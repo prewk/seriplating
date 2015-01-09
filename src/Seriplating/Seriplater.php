@@ -135,18 +135,18 @@ class Seriplater implements SeriplaterInterface
      */
     public function hasMany($entityName)
     {
-        return $this->rule->make(self::HAS_MANY, $entityName);
+        return $this->rule->make($this->applyModifiers(self::HAS_MANY), $entityName);
     }
 
     /**
-     * Field passed from parent above
+     * Field passed from parent above, arguments are a priority list starting with
+     * the most prioritized, fallbacks to the next etc
      *
-     * @param string $field Field to inherit
      * @return RuleInterface
      */
-    public function inherits($field)
+    public function inherits()
     {
-        return $this->rule->make(self::INHERITS, $field);
+        return $this->rule->make($this->applyModifiers(self::INHERITS), func_get_args());
     }
 }
 
