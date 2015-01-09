@@ -75,7 +75,38 @@ class GenericDeserializerTest extends SeriplatingTestCase
         $expected = [
             "foo" => "bar",
         ];
-        $id = 123;
+        $expectedEntityData = [
+            "id" => 123,
+            "foo" => "bar",
+        ];
+
+        $this->repository
+            ->shouldReceive("create")
+            ->once()
+            ->with($expected)
+            ->andReturn($expectedEntityData);
+
+        $deser = new GenericDeserializer($this->idResolver);
+        $entityData = $deser->deserialize($template, $this->repository, $serialized);
+
+        $this->assertEquals($expectedEntityData, $entityData);
+    }
+
+    public function test_scalar_values()
+    {
+        $t = $this->seriplater;
+
+        $template = [
+            "foo" => $t->value(),
+            "bar" => 123,
+        ];
+        $serialized = [
+            "foo" => "bar",
+        ];
+        $expected = [
+            "foo" => "bar",
+            "bar" => 123,
+        ];
         $expectedEntityData = [
             "id" => 123,
             "foo" => "bar",

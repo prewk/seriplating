@@ -109,7 +109,6 @@ class GenericDeserializer implements DeserializerInterface
      * @param string $dotPath Dot path to scope
      * @return array Resulting entity data to create with the repository
      * @TODO Needs refactoring
-     * @TODO Support scalar values
      * @throws IntegrityException when illegal structures or missing pieces are encountered
      */
     private function walkDeserializedData($template, $data, $dotPath = "")
@@ -242,6 +241,10 @@ class GenericDeserializer implements DeserializerInterface
                     $content->isOptional()
                 ) {
                     continue;
+                } elseif (is_scalar($content)) {
+                    // Scalar value, just use it and move on
+                    $entityData[$field] = $content;
+                    continue;
                 } elseif (!isset($data[$field])) {
                     throw new IntegrityException("Required field '$field' missing");
                 }
@@ -255,10 +258,10 @@ class GenericDeserializer implements DeserializerInterface
             return $entityData;
         } else {
             if ($template->isValue()) {
+                // Value field, return the scope data
                 return $data;
             } elseif ($template->isReference()) {
-                $dotParts = explode(".", $dotPath);
-
+                // Reference field, save for putting into the id resolver later
                 $this->updatesToDefer[] = [
                     "internalId" => $data["_ref"],
                     "fullDotPath" => $dotPath,
@@ -267,6 +270,7 @@ class GenericDeserializer implements DeserializerInterface
 
                 return 0;
             } elseif ($template->isConditions()) {
+                // Conditional field, go through the conditions and recurse
                 $value = $template->getValue();
                 $field = $value["field"];
                 $cases = $value["cases"];
@@ -282,6 +286,7 @@ class GenericDeserializer implements DeserializerInterface
                 // Default case
                 return $this->walkDeserializedData($defaultCase, $data, $dotPath);
             } elseif ($template->isDeep()) {
+                // Deep field, use regexp to find and apply rules
                 $finders = $template->getValue();
                 $newData = $data;
                 $dotData = Arr::dot($data);
