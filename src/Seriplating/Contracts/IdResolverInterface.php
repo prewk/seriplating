@@ -21,7 +21,7 @@ interface IdResolverInterface
      * @param callable $updateHandler A callable with which to perform the update
      * @return void
      */
-    public function deferResolution($internalId, callable $updateHandler);
+    public function deferCustom($internalId, callable $updateHandler);
 
     /**
      * Save an encountered reference for later resolution

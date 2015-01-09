@@ -61,7 +61,7 @@ class IdResolver implements IdResolverInterface
      * @param callable $updateHandler A callable with which to perform the update
      * @return void
      */
-    public function deferResolution($internalId, callable $updateHandler)
+    public function deferCustom($internalId, callable $updateHandler)
     {
         $this->customDeferred[] = [
             "ids" => !is_array($internalId) ? [$internalId] : $internalId,
@@ -174,7 +174,7 @@ class IdResolver implements IdResolverInterface
         if (!isset($this->deferred[$repository])) {
             $this->deferred[$repository] = [];
         }
-        
+
         $records = $this->deferred[$repository];
 
         $records[] = [

@@ -15,11 +15,11 @@ class IdResolverTest extends SeriplatingTestCase
         $foo1 = null;
 
         $resolver->bind("foos_0", 1);
-        $resolver->deferResolution("foos_1", function($dbId) use (&$foo1) {
+        $resolver->deferCustom("foos_1", function($dbId) use (&$foo1) {
             $foo1 = $dbId;
         });
         $resolver->bind("foos_1", 2);
-        $resolver->deferResolution("foos_0", function($dbId) use (&$foo0) {
+        $resolver->deferCustom("foos_0", function($dbId) use (&$foo0) {
             $foo0 = $dbId;
         });
 
@@ -89,7 +89,7 @@ class IdResolverTest extends SeriplatingTestCase
         $resolver->bind("foos_1", 2);
         $resolver->bind("foos_2", 3);
 
-        $resolver->deferResolution(["foos_0", null, "foos_1", "foos_2"], function($dbId1, $isNull, $dbId2, $dbId3) use (&$foo0, &$shouldBeNull, &$foo1, &$foo2) {
+        $resolver->deferCustom(["foos_0", null, "foos_1", "foos_2"], function($dbId1, $isNull, $dbId2, $dbId3) use (&$foo0, &$shouldBeNull, &$foo1, &$foo2) {
             $foo0 = $dbId1;
             $shouldBeNull = $isNull;
             $foo1 = $dbId2;
