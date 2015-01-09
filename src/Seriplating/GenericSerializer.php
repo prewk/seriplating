@@ -82,9 +82,11 @@ class GenericSerializer implements SerializerInterface
             foreach ($template as $field => $content) {
                 if (
                     $content instanceof RuleInterface &&
-                    (!isset($data[$field]) && $content->isOptional()) ||
-                    $content->isHasMany() ||
-                    $content->isInherited()
+                    (
+                        (!isset($data[$field]) && $content->isOptional()) ||
+                        $content->isHasMany() ||
+                        $content->isInherited()
+                    )
                 ) {
                     continue;
                 } elseif (
@@ -92,18 +94,29 @@ class GenericSerializer implements SerializerInterface
                     $content->isId()
                 ) {
                     $serialized["_id"] = $this->idFactory->get($content->getValue(), $data[$field]);
+                    continue;
                 } elseif (!isset($data[$field])) {
                     throw new IntegrityException("Required field '$field' missing");
-                } else {
-                    $serialized[$field] = $this->walkUnserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
+                }
 
+                $fieldValue = $this->walkUnserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
+                if (!is_null($fieldValue)) {
+                    $serialized[$field] = $fieldValue;
                 }
             }
 
             return $serialized;
         } else {
-            if ($template->isValue()) {
+            if (is_scalar($template)) {
+                return $template;
+            } elseif ($template->isValue()) {
                 return $data;
+            } elseif (
+                $template->isInherited() ||
+                $template->isIncrementing() ||
+                $template->isHasMany()
+            ) {
+                return null;
             } elseif ($template->isReference()) {
                 if ($template->isCollection()) {
                     $refs = [];

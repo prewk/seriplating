@@ -61,8 +61,14 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "name" => $t->value(),
             "primary_menu_id" => $t->references("menus"),
             "landing_page_id" => $t->references("pages"),
-            "color_swatches" => $t->collectionOf()->references("color_swatches"),
+            "font_preset" => $t->value(),
+            "font_variables" => $t->value(),
+            "color_swatches" => $t->hasMany("color_swatches"),
             "sections" => $t->hasMany("sections"),
+            "tweaks" => $t->hasMany("tweaks"),
+            "pages" => $t->hasMany("pages"),
+            "menus" => $t->hasMany("menus"),
+            "aliases" => $t->hasMany("aliases"),
         ]);
 
         // Color swatch
@@ -133,6 +139,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "id" => $t->id("pages"),
             "site_id" => $t->inherits("id"),
             "name" => $t->value(),
+            "sections" => $t->hasMany("sections"),
         ]);
 
         // Section
@@ -156,11 +163,12 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                     "/\\.blocks\\.\\d+.id$/" => $t->references("blocks"),
                     "/^resources\\.[\\d]+\\.id$/" => $t->references("resources"),
                 ]),
-                "menu" => [ // @TODO: Untested nesting
+                "menu" => [
                     "menu_id" => $t->references("menus"),
                 ],
             ], $t->value()),
             "resources" => $t->hasMany("resources"),
+            "blocks" => $t->hasMany("blocks"),
         ]);
 
         // Block
@@ -170,10 +178,10 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "site_id" => $t->inherits("site_id"),
             "type" => $t->value(),
             "resources" => $t->hasMany("resources"),
-            "sort_order" => $t->increments(),
             "data" => $t->conditions("type", [
                 "image" => $t->deep([
                     "/^resources\\.[\\d]+\\.id$/" => $t->references("resources"),
+                    "/^current_resource_id$/" => $t->references("resources"),
                 ]),
             ], $t->value()),
         ]);
@@ -182,11 +190,225 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         $this->resourceRepo = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
         $this->resource = new SeriplatingTemplate($genSerializer, $preExDeserializer, $this->resourceRepo, [
             "id" => $t->id("resources"),
+            "site_id" => $t->inherits("site_id", "id"),
         ]);
+
+        $this->hier
+            ->register($this->site)
+            ->register($this->colorSwatch)
+            ->register($this->tweak)
+            ->register($this->section)
+            ->register($this->page)
+            ->register($this->block)
+            ->register($this->resource)
+            ->register($this->menu)
+            ->register($this->menuItem)
+            ->register($this->alias);
     }
 
-    public function test_cms()
+    public function test_cms_serialization()
     {
+        $site = [
+            "id" => 1,
+            "name" => "Foo",
+            "primary_menu_id" => 1,
+            "landing_page_id" => 1,
+            "font_preset" => "sans",
+            "font_variables" => ["HEADING" => "sans"],
+            "color_swatches" => [
+                ["id" => 1, "site_id" => 1, "value" => "#ffff00"],
+            ],
+            "tweaks" => [
+                [
+                    "id" => 1,
+                    "site_id" => 1,
+                    "tweakable_type" => "Site",
+                    "tweakable_id" => 1,
+                    "definition" => "heading_block.text_color",
+                    "data" => [
+                        "color_swatch_id" => 1,
+                    ],
+                ]
+            ],
+            "sections" => [
+                [
+                    "id" => 1,
+                    "site_id" => 1,
+                    "sectionable_type" => "Site",
+                    "sectionable_id" => 1,
+                    "type" => "menu",
+                    "name" => "foo",
+                    "position" => "top",
+                    "sort_order" => 0,
+                    "data" => [
+                        "menu_id" => 1,
+                    ],
+                    "resources" => [],
+                    "blocks" => [],
+                ],
+            ],
+            "pages" => [
+                ["id" => 1, "site_id" => 1, "name" => "The foo page", "sections" => [
+                    [
+                        "id" => 2,
+                        "site_id" => 1,
+                        "sectionable_type" => "Page",
+                        "sectionable_id" => 1,
+                        "type" => "block",
+                        "name" => "foo",
+                        "position" => "",
+                        "sort_order" => 0,
+                        "data" => [
+                            "rows" => [
+                                [
+                                    "columns" => [
+                                        [
+                                            "blocks" => [
+                                                ["id" => 1],
+                                                ["id" => 2],
+                                            ],
+                                        ],
+                                        [
+                                            "blocks" => [
+                                                ["id" => 3],
+                                                ["id" => 4],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        "resources" => [],
+                        "blocks" => [
+                            [
+                                "id" => 1,
+                                "site_id" => 1,
+                                "type" => "heading",
+                                "resources" => [],
+                                "data" => [
+                                    "content" => "<h1>Lorem ipsum</h1>",
+                                ],
+                            ],
+                            [
+                                "id" => 2,
+                                "site_id" => 1,
+                                "type" => "heading",
+                                "resources" => [],
+                                "data" => [
+                                    "content" => "<h1>Lorem ipsum</h1>",
+                                ],
+                            ],
+                            [
+                                "id" => 3,
+                                "site_id" => 1,
+                                "type" => "heading",
+                                "resources" => [],
+                                "data" => [
+                                    "content" => "<h1>Lorem ipsum</h1>",
+                                ],
+                            ],
+                            [
+                                "id" => 4,
+                                "site_id" => 1,
+                                "type" => "heading",
+                                "resources" => [],
+                                "data" => [
+                                    "content" => "<h1>Lorem ipsum</h1>",
+                                ],
+                            ],
+                        ]
+                    ],
+                ]],
+                ["id" => 2, "site_id" => 1, "name" => "The bar page", "sections" => [
+                    [
+                        "id" => 2,
+                        "site_id" => 1,
+                        "sectionable_type" => "Page",
+                        "sectionable_id" => 1,
+                        "type" => "block",
+                        "name" => "foo",
+                        "position" => "",
+                        "sort_order" => 0,
+                        "data" => [
+                            "rows" => [
+                                [
+                                    "columns" => [
+                                        [
+                                            "blocks" => [
+                                                ["id" => 4],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        "resources" => [],
+                        "blocks" => [
+                            [
+                                "id" => 4,
+                                "site_id" => 1,
+                                "type" => "image",
+                                "resources" => [
+                                    ["id" => 1, "site_id" => 1],
+                                ],
+                                "data" => [
+                                    "resources" => [
+                                        ["id" => 1, "transforms" => []],
+                                    ],
+                                    "current_resource_id" => 1,
+                                ],
+                            ],
+                        ]
+                    ],
+                ]],
+            ],
+            "menus" => [
+                [
+                    "id" => 1,
+                    "site_id" => 1,
+                    "locale" => "en-US",
+                    "menu_items" => [
+                        [
+                            "id" => 1,
+                            "site_id" => 1,
+                            "alias_id" => 1,
+                            "menu_id" => 1,
+                            "parent_id" => 0,
+                            "sort_order" => 0,
+                            "menu_items" => []
+                        ],
+                        [
+                            "id" => 1,
+                            "site_id" => 1,
+                            "alias_id" => 2,
+                            "menu_id" => 1,
+                            "parent_id" => 0,
+                            "sort_order" => 1,
+                            "menu_items" => []
+                        ],
+                    ],
+                ],
+            ],
+            "aliases" => [
+                [
+                    "id" => 1,
+                    "site_id" => 1,
+                    "aliasable_type" => "Page",
+                    "aliasable_id" => 1,
+                    "alias" => "foo",
+                ],
+                [
+                    "id" => 2,
+                    "site_id" => 1,
+                    "aliasable_type" => "Page",
+                    "aliasable_id" => 2,
+                    "alias" => "bar",
+                ],
+            ],
+        ];
 
+        $serialization = $this->hier->serialize("sites", $site);
+
+        print_r($serialization);
     }
 }
