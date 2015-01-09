@@ -16,6 +16,7 @@ class Seriplater implements SeriplaterInterface
     const DEEP = 64;
     const HAS_MANY = 128;
     const INHERITS = 256;
+    const INCREMENTS = 512;
 
     protected $rule;
 
@@ -142,11 +143,27 @@ class Seriplater implements SeriplaterInterface
      * Field passed from parent above, arguments are a priority list starting with
      * the most prioritized, fallbacks to the next etc
      *
+     * @param string ... list of fields
      * @return RuleInterface
      */
     public function inherits()
     {
         return $this->rule->make($this->applyModifiers(self::INHERITS), func_get_args());
+    }
+
+    /**
+     * When deserializing hierarchically, the parent sets the child's field incrementally
+     *
+     * @param int $start Start
+     * @param int $increment Increment
+     * @return RuleInterface
+     */
+    public function increments($start = 0, $increment = 1)
+    {
+        return $this->rule->make($this->applyModifiers(self::INCREMENTS), [
+            "start" => $start,
+            "increment" => $increment,
+        ]);
     }
 }
 

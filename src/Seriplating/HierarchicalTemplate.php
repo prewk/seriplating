@@ -194,6 +194,7 @@ class HierarchicalTemplate implements HierarchicalInterface
         // Deserialize the relations one-by-one
         $entityField = [];
         foreach ($data[$field] as $child) {
+            // @TODO: Sort order support
             $entityField[] = $this->deserializeRelations($this->templateRegistry[$relatedEntityName], $child, $entityData);
         }
 

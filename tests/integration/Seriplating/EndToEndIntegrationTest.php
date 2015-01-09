@@ -73,7 +73,6 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "value" => $t->value(),
         ]);
 
-        // @TODO: Need conditions support for the inherits
         $this->tweakRepo = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
         $this->tweak = new SeriplatingTemplate($genSerializer, $genDeserializer, $this->tweakRepo, [
             "id" => $t->id("tweaks"),
@@ -138,7 +137,6 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         ]);
 
         // Section
-        // @TODO: Need conditions support for the inherits
         // @TODO: Add sort order support
         $this->sectionRepo = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
         $this->section = new SeriplatingTemplate($genSerializer, $genDeserializer, $this->sectionRepo, [

@@ -80,4 +80,15 @@ class SeriplaterIntegrationTest extends SeriplatingTestCase
 
         $this->assertTrue($rule->isInherited());
     }
+
+    public function test_increments()
+    {
+        $rule1 = $this->seriplater->increments();
+        $rule2 = $this->seriplater->increments(1);
+        $rule3 = $this->seriplater->increments(2, -5);
+
+        $this->assertTrue($rule1->isIncrementing());
+        $this->assertTrue($rule2->isIncrementing());
+        $this->assertTrue($rule3->isIncrementing());
+    }
 }

@@ -108,6 +108,7 @@ class GenericDeserializer implements DeserializerInterface
      * @param mixed $data Scope data
      * @param string $dotPath Dot path to scope
      * @return array Resulting entity data to create with the repository
+     * @TODO Needs refactoring
      * @throws IntegrityException when illegal structures or missing pieces are encountered
      */
     private function walkDeserializedData($template, $data, $dotPath = "")

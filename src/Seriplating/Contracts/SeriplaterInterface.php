@@ -75,7 +75,17 @@ interface SeriplaterInterface
      * Field passed from parent above, arguments are a priority list starting with
      * the most prioritized, fallbacks to the next etc
      *
+     * @param string ... list of fields
      * @return RuleInterface
      */
     public function inherits();
+
+    /**
+     * When deserializing hierarchically, the parent sets the child's field incrementally
+     *
+     * @param int $start Start
+     * @param int $increment Increment
+     * @return RuleInterface
+     */
+    public function increments($start = 0, $increment = 1);
 }

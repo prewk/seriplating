@@ -83,4 +83,9 @@ interface RuleInterface
      * @return bool
      */
     public function isInherited();
+
+    /**
+     * @return bool
+     */
+    public function isIncrementing();
 }

@@ -141,4 +141,12 @@ class Rule implements RuleInterface
     {
         return (Seriplater::INHERITS & $this->type) !== 0;
     }
+
+    /**
+     * @return bool
+     */
+    public function isIncrementing()
+    {
+        return (Seriplater::INCREMENTS & $this->type) !== 0;
+    }
 }
