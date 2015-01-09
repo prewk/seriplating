@@ -2,7 +2,6 @@
 
 namespace Prewk\Seriplating;
 
-use Prewk\Seriplating\Contracts\RepositoryInterface;
 use Prewk\Seriplating\Special\PreExistingEntityDeserializer;
 use Prewk\SeriplatingTemplate;
 use SeriplatingTestCase;
@@ -79,12 +78,11 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "value" => $t->value(),
         ]);
 
+        // Tweak
         $this->tweakRepo = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
         $this->tweak = new SeriplatingTemplate($genSerializer, $genDeserializer, $this->tweakRepo, [
             "id" => $t->id("tweaks"),
-            "site_id" => $t->conditions("tweakable_type", [
-                "Site" => $t->inherits("id"),
-            ], $t->inherits("site_id")),
+            "site_id" => $t->inherits("site_id", "id"),
             "tweakable_type" => $t->value(),
             "tweakable_id" => $t->inherits("id"),
             "definition" => $t->value(),
@@ -141,9 +139,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         $this->sectionRepo = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
         $this->section = new SeriplatingTemplate($genSerializer, $genDeserializer, $this->sectionRepo, [
             "id" => $t->id("sections"),
-            "site_id" => $t->conditions("sectionable_type", [
-                "Site" => $t->inherits("id"),
-            ], $t->inherits("site_id")),
+            "site_id" => $t->inherits("site_id", "id"),
             "sectionable_type" => $t->value(),
             "sectionable_id" => $t->inherits("id"),
             "type" => $t->value(),
@@ -445,7 +441,6 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "landing_page_id" => 1,
         ];
         $siteUpdated = array_merge($siteCreated, $siteUpdate);
-
         $this->siteRepo->shouldReceive("create")->once()->with($siteCreate)->andReturn($siteCreated)
             ->shouldReceive("update")->once()->with($siteUpdate)->andReturn($siteUpdated);
 
@@ -456,6 +451,132 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         ];
         $colorSwatchCreated = ["id" => 1] + $colorSwatchCreate;
         $this->colorSwatchRepo->shouldReceive("create")->once()->with($colorSwatchCreate)->andReturn($colorSwatchCreated);
+
+        // Tweak
+        $tweakCreate = [
+            "site_id" => 1,
+            "tweakable_type" => "Site",
+            "tweakable_id" => 1,
+            "definition" => "heading_block.text_color",
+            "data" => [
+                "color_swatch_id" => 0,
+            ],
+        ];
+        $tweakCreated = ["id" => 1] + $tweakCreate;
+        $tweakUpdate = [
+            "data" => [
+                "color_swatch_id" => 1,
+            ],
+        ];
+        $tweakUpdated = array_merge($tweakCreated, $tweakUpdate);
+        $this->tweakRepo->shouldReceive("create")->once()->with($tweakCreate)->andReturn($tweakCreated)
+            ->shouldReceive("update")->once()->with($tweakUpdate)->andReturn($tweakUpdated);
+
+        // Section
+        $sectionCreate = [
+            "site_id" => 1,
+            "sectionable_type" => "Site",
+            "sectionable_id" => 1,
+            "type" => "menu",
+            "name" => "foo",
+            "position" => "top",
+            "sort_order" => 0,
+            "data" => [
+                "menu_id" => 0,
+            ],
+        ];
+        $sectionCreated = ["id" => 1];
+        $sectionUpdate = [
+            "data" => [
+                "menu_id" => 1,
+            ]
+        ];
+        $sectionUpdated = array_merge($sectionCreated, $sectionUpdate);
+        $this->sectionRepo->shouldReceive("create")->once()->with($sectionCreate)->andReturn($sectionCreated)
+            ->shouldReceive("update")->once()->with($sectionUpdate)->andReturn($sectionUpdated);
+
+        // Page
+        $pageCreate = [
+            "site_id" => 1,
+            "name" => "The foo page",
+        ];
+        $pageCreated = ["id" => 1] + $pageCreate;
+        $this->pageRepo->shouldReceive("create")->once()->with($pageCreate)->andReturn($pageCreated);
+
+        // Section
+        $sectionCreate = [
+            "site_id" => 1,
+            "sectionable_type" => "Page",
+            "sectionable_id" => 1,
+            "type" => "block",
+            "name" => "foo",
+            "position" => "",
+            "sort_order" => 0,
+            "data" => [
+                "rows" => [
+                    [
+                        "columns" => [
+                            [
+                                "blocks" => [
+                                    ["id" => 0],
+                                    ["id" => 0],
+                                ],
+                            ],
+                            [
+                                "blocks" => [
+                                    ["id" => 0],
+                                    ["id" => 0],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $sectionCreated = ["id" => 2] + $sectionCreate;
+        $sectionUpdate = [
+            "data" => [
+                "rows" => [
+                    [
+                        "columns" => [
+                            [
+                                "blocks" => [
+                                    ["id" => 1],
+                                    ["id" => 2],
+                                ],
+                            ],
+                            [
+                                "blocks" => [
+                                    ["id" => 3],
+                                    ["id" => 4],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        ];
+        $sectionUpdated = array_merge($sectionCreated, $sectionUpdate);
+        $this->sectionRepo->shouldReceive("create")->once()->with($sectionCreate)->andReturn($sectionCreated)
+            ->shouldReceive("update")->once()->with($sectionUpdate)->andReturn($sectionUpdated);
+
+        // Block
+        $blockCreate = [
+            "site_id" => 1,
+            "type" => "heading",
+            "data" => [
+                "content" => "<h1>Lorem ipsum</h1>",
+            ],
+        ];
+        $blockCreated1 = ["id" => 1] + $blockCreate;
+        $blockCreated2 = ["id" => 2] + $blockCreate;
+        $blockCreated3 = ["id" => 3] + $blockCreate;
+        $blockCreated4 = ["id" => 4] + $blockCreate;
+        $this->blockRepo->shouldReceive("create")->with($blockCreate)->andReturn($blockCreated1)
+            ->shouldReceive("create")->with($blockCreate)->andReturn($blockCreated2)
+            ->shouldReceive("create")->with($blockCreate)->andReturn($blockCreated3)
+            ->shouldReceive("create")->with($blockCreate)->andReturn($blockCreated4);
+
 
         return $this->hier->deserialize("sites", $this->serialize());
     }

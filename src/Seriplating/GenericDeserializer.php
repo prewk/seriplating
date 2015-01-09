@@ -69,6 +69,7 @@ class GenericDeserializer implements DeserializerInterface
         $entityData = $this->walkDeserializedData($template, $toDeserialize);
 
         // Create the entity via the repository
+        echo "CREATE: " . json_encode($entityData) . "\n";
         $createdEntity = $repository->create($entityData);
         $primaryKey = $createdEntity[$primaryKeyField];
 
