@@ -262,13 +262,18 @@ class GenericDeserializer implements DeserializerInterface
                 return $data;
             } elseif ($template->isReference()) {
                 // Reference field, save for putting into the id resolver later
+                $fallback = $template->getValue()["fallback"];
                 $this->updatesToDefer[] = [
                     "internalId" => $data["_ref"],
                     "fullDotPath" => $dotPath,
-                    "fallback" => $template->getValue()["fallback"],
+                    "fallback" => $fallback,
                 ];
 
-                return 0;
+                if (is_null($fallback)) {
+                    return 0;
+                } else {
+                    return $fallback;
+                }
             } elseif ($template->isConditions()) {
                 // Conditional field, go through the conditions and recurse
                 $value = $template->getValue();
