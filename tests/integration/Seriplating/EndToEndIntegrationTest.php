@@ -102,15 +102,14 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         ]);
 
         // Menu item
-        // @TODO: Add sort order support
         $this->menuItemRepo = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
         $this->menuItem = new SeriplatingTemplate($genSerializer, $genDeserializer, $this->menuItemRepo, [
             "id" => $t->id("menu_items"),
             "site_id" => $t->inherits("site_id"),
             "alias_id" => $t->references("aliases"),
             "menu_id" => $t->inherits("menu_id", "id"),
-            "parent_id" => $t->references("menu_items"), // @TODO: Add fallback support (to 0)
-            "sort_order" => $t->value(), // @TODO
+            "parent_id" => $t->references("menu_items", 0),
+            "sort_order" => $t->increments(),
             "menu_items" => $t->hasMany("menu_items"),
         ]);
 
@@ -137,7 +136,6 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         ]);
 
         // Section
-        // @TODO: Add sort order support
         $this->sectionRepo = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
         $this->section = new SeriplatingTemplate($genSerializer, $genDeserializer, $this->sectionRepo, [
             "id" => $t->id("sections"),
@@ -152,7 +150,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "type" => $t->value(),
             "name" => $t->value(),
             "position" => $t->value(),
-            "sort_order" => $t->value(), // @TODO
+            "sort_order" => $t->increments(),
             "data" => $t->conditions("type", [
                 "block" => $t->deep([
                     "/\\.blocks\\.\\d+.id$/" => $t->references("blocks"),
@@ -166,14 +164,13 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         ]);
 
         // Block
-        // @TODO: Add sort order support
         $this->blockRepo = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
         $this->block = new SeriplatingTemplate($genSerializer, $genDeserializer, $this->blockRepo, [
             "id" => $t->id("blocks"),
             "site_id" => $t->inherits("site_id"),
             "type" => $t->value(),
             "resources" => $t->hasMany("resources"),
-            "sort_order" => $t->value(), // @TODO
+            "sort_order" => $t->increments(),
             "data" => $t->conditions("type", [
                 "image" => $t->deep([
                     "/^resources\\.[\\d]+\\.id$/" => $t->references("resources"),

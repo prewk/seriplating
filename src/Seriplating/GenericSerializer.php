@@ -109,12 +109,12 @@ class GenericSerializer implements SerializerInterface
                     $refs = [];
 
                     foreach ($data as $dbId) {
-                        $refs[] = ["_ref" => $this->idFactory->get($template->getValue(), $dbId)];
+                        $refs[] = ["_ref" => $this->idFactory->get($template->getValue()["entityName"], $dbId)];
                     }
 
                     return $refs;
                 } else {
-                    return ["_ref" => $this->idFactory->get($template->getValue(), $data)];
+                    return ["_ref" => $this->idFactory->get($template->getValue()["entityName"], $data)];
                 }
             } elseif ($template->isConditions()) {
                 $value = $template->getValue();

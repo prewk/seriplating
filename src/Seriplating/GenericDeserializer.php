@@ -262,6 +262,7 @@ class GenericDeserializer implements DeserializerInterface
                 $this->updatesToDefer[] = [
                     "internalId" => $data["_ref"],
                     "fullDotPath" => $dotPath,
+                    "fallback" => $template->getValue()["fallback"],
                 ];
 
                 return 0;
@@ -317,7 +318,7 @@ class GenericDeserializer implements DeserializerInterface
     protected function deferUpdates(RepositoryInterface $repository, $primaryKey, array $createdEntity)
     {
         foreach ($this->updatesToDefer as $updateToDefer) {
-            $this->idResolver->defer($updateToDefer["internalId"], $repository, $primaryKey, $updateToDefer["fullDotPath"], $createdEntity);
+            $this->idResolver->defer($updateToDefer["internalId"], $repository, $primaryKey, $updateToDefer["fullDotPath"], $createdEntity, $updateToDefer["fallback"]);
         }
     }
 }

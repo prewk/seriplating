@@ -72,7 +72,7 @@ class IdResolver implements IdResolverInterface
     /**
      * Resolve the saved encountered references by performing the deferred updates
      *
-     * @throws DataIntegrityException if an internal id couldn't be resolved
+     * @throws IntegrityException if an internal id couldn't be resolved
      * @return void
      */
     public function resolve()
@@ -91,10 +91,17 @@ class IdResolver implements IdResolverInterface
 
                 // Get resolved db id
                 if (!isset($this->internalIdToDbId[$record["internalId"]])) {
-                    // Crash if the internal ids are missing from our lookup table
-                    throw new DataIntegrityException("An internal id couldn't be resolved: " . $record["internalId"]);
+                    // Fallback ?
+                    if (!is_null($record["fallback"])) {
+                        // Yep
+                        $dbId = $record["fallback"];
+                    } else {
+                        // Nope, crash, the internal id is missing from our lookup table
+                        throw new IntegrityException("An internal id couldn't be resolved: " . $record["internalId"]);
+                    }
+                } else {
+                    $dbId = $this->internalIdToDbId[$record["internalId"]];
                 }
-                $dbId = $this->internalIdToDbId[$record["internalId"]];
 
                 // Get root field from possible dot notation
                 // Root field = Table.field
@@ -140,7 +147,7 @@ class IdResolver implements IdResolverInterface
 
                 if (!isset($this->internalIdToDbId[$internalId])) {
                     // Crash if the internal ids are missing from our lookup table
-                    throw new DataIntegrityException("An internal id couldn't be resolved: " . $internalId);
+                    throw new IntegrityException("An internal id couldn't be resolved: " . $internalId);
                 }
 
                 $dbIds[] = $this->internalIdToDbId[$internalId];
@@ -159,14 +166,15 @@ class IdResolver implements IdResolverInterface
      * @param mixed $primaryKey Primary key used for updating the repository
      * @param string $field Field, in dot notation, to receive the update
      * @param array $initialEntityData Initial entity data used to not overwrite "deep" fields
+     * @param null $fallback Optional fallback instead of exception when relation couldn't be resolved
      * @return void
      */
-    public function defer($internalId, RepositoryInterface $repository, $primaryKey, $field, $initialEntityData = [])
+    public function defer($internalId, RepositoryInterface $repository, $primaryKey, $field, $initialEntityData = [], $fallback = null)
     {
         if (!isset($this->deferred[$repository])) {
             $this->deferred[$repository] = [];
         }
-
+        
         $records = $this->deferred[$repository];
 
         $records[] = [
@@ -174,6 +182,7 @@ class IdResolver implements IdResolverInterface
             "primaryKey" => $primaryKey,
             "field" => $field,
             "initialEntityData" => $initialEntityData,
+            "fallback" => $fallback,
         ];
 
         $this->deferred[$repository] = $records;

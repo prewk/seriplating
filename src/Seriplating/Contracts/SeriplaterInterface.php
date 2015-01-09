@@ -41,9 +41,10 @@ interface SeriplaterInterface
      * This field is a reference to another entity
      *
      * @param string $entityName Name of the entity
+     * @param null $fallback Optional fallback, if provided the resolver won't throw an exception
      * @return RuleInterface
      */
-    public function references($entityName);
+    public function references($entityName, $fallback = null);
 
     /**
      * Treat field differently depending on the case with optional default case

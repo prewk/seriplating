@@ -103,4 +103,42 @@ class IdResolverTest extends SeriplatingTestCase
         $this->assertEquals(2, $foo1);
         $this->assertEquals(3, $foo2);
     }
+
+    public function test_fallbacks()
+    {
+        $resolver = new IdResolver;
+
+        $fooRepository = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
+        $barRepository = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
+
+        $resolver->bind("foos_0", 1);
+        $resolver->defer("bars_2", $fooRepository, 1, "data.bars.0.bar_id");
+        $resolver->defer("bars_3", $fooRepository, 1, "data.bars.1.bar_id", [], 0);
+
+        $resolver->bind("foos_1", 2);
+
+        $resolver->bind("bars_2", 3);
+        $resolver->defer("foos_0", $barRepository, 3, "foo_id");
+
+        $fooRepository
+            ->shouldReceive("update")
+            ->once()
+            ->with(1, [
+                "data" => [
+                    "bars" => [
+                        [ "bar_id" => 3 ],
+                        [ "bar_id" => 0 ],
+                    ],
+                ],
+            ]);
+
+        $barRepository
+            ->shouldReceive("update")
+            ->once()
+            ->with(3, [
+                "foo_id" => 1,
+            ]);
+
+        $resolver->resolve();
+    }
 }

@@ -31,9 +31,10 @@ interface IdResolverInterface
      * @param mixed $primaryKey Primary key used for updating the repository
      * @param string $field Field, in dot notation, to receive the update
      * @param array $initialEntityData Initial entity data used to not overwrite "deep" fields
+     * @param null $fallback Optional fallback instead of exception when relation couldn't be resolved
      * @return void
      */
-    public function defer($internalId, RepositoryInterface $repository, $primaryKey, $field, $initialEntityData = []);
+    public function defer($internalId, RepositoryInterface $repository, $primaryKey, $field, $initialEntityData = [], $fallback = null);
 
     /**
      * Resolve the saved encountered references by performing the deferred updates

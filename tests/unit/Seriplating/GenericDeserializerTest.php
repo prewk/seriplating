@@ -228,7 +228,7 @@ class GenericDeserializerTest extends SeriplatingTestCase
         $this->idResolver
             ->shouldReceive("defer")
             ->once()
-            ->with("foos_0", $this->repository, 123, "foo_id", $expectedEntityData);
+            ->with("foos_0", $this->repository, 123, "foo_id", $expectedEntityData, null);
 
         $deser = new GenericDeserializer($this->idResolver);
         $entityData = $deser->deserialize($template, $this->repository, $serialized);
@@ -294,7 +294,7 @@ class GenericDeserializerTest extends SeriplatingTestCase
         $this->idResolver
             ->shouldReceive("defer")
             ->once()
-            ->with("bars_0", $this->repository, 456, "data", $expectedEntityData2);
+            ->with("bars_0", $this->repository, 456, "data", $expectedEntityData2, null);
 
         $deser = new GenericDeserializer($this->idResolver);
         $entityData = $deser->deserialize($template, $this->repository, $serialized2);
@@ -401,23 +401,23 @@ class GenericDeserializerTest extends SeriplatingTestCase
         $this->idResolver
             ->shouldReceive("defer")
             ->once()
-            ->with("blocks_0", $this->repository, 123, "data.rows.0.columns.0.blocks.0.id", $expectedEntityData)
+            ->with("blocks_0", $this->repository, 123, "data.rows.0.columns.0.blocks.0.id", $expectedEntityData, null)
             ->shouldReceive("defer")
             ->once()
-            ->with("blocks_1", $this->repository, 123, "data.rows.0.columns.0.blocks.1.id", $expectedEntityData)
+            ->with("blocks_1", $this->repository, 123, "data.rows.0.columns.0.blocks.1.id", $expectedEntityData, null)
             ->shouldReceive("defer")
             ->once()
-            ->with("blocks_2", $this->repository, 123, "data.rows.0.columns.1.blocks.0.id", $expectedEntityData)
+            ->with("blocks_2", $this->repository, 123, "data.rows.0.columns.1.blocks.0.id", $expectedEntityData, null)
             ->shouldReceive("defer")
             ->once()
-            ->with("blocks_3", $this->repository, 123, "data.rows.0.columns.1.blocks.1.id", $expectedEntityData)
+            ->with("blocks_3", $this->repository, 123, "data.rows.0.columns.1.blocks.1.id", $expectedEntityData, null)
 
             ->shouldReceive("defer")
             ->once()
-            ->with("resources_0", $this->repository, 123, "data.resources.0.id", $expectedEntityData)
+            ->with("resources_0", $this->repository, 123, "data.resources.0.id", $expectedEntityData, null)
             ->shouldReceive("defer")
             ->once()
-            ->with("resources_1", $this->repository, 123, "data.resources.1.id", $expectedEntityData);
+            ->with("resources_1", $this->repository, 123, "data.resources.1.id", $expectedEntityData, null);
 
         $this->repository
             ->shouldReceive("create")
