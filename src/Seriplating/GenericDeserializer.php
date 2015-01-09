@@ -109,6 +109,7 @@ class GenericDeserializer implements DeserializerInterface
      * @param string $dotPath Dot path to scope
      * @return array Resulting entity data to create with the repository
      * @TODO Needs refactoring
+     * @TODO Support scalar values
      * @throws IntegrityException when illegal structures or missing pieces are encountered
      */
     private function walkDeserializedData($template, $data, $dotPath = "")
@@ -227,6 +228,13 @@ class GenericDeserializer implements DeserializerInterface
                     }
 
                     $entityData[$field] = $foundInheritance;
+                    continue;
+                } elseif (
+                    $content instanceof RuleInterface &&
+                    $content->isIncrementing()
+                ) {
+                    // Inherit incrementing value from parent
+                    $entityData[$field] = $this->inherited["@$field"];
                     continue;
                 } elseif (
                     !isset($data[$field]) &&
