@@ -206,7 +206,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             ->register($this->alias);
     }
 
-    public function test_cms_serialization()
+    private function serialize()
     {
         $site = [
             "id" => 1,
@@ -375,7 +375,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                             "menu_id" => 1,
                             "parent_id" => 0,
                             "sort_order" => 0,
-                            "menu_items" => []
+                            "menu_items" => [],
                         ],
                         [
                             "id" => 1,
@@ -384,7 +384,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                             "menu_id" => 1,
                             "parent_id" => 0,
                             "sort_order" => 1,
-                            "menu_items" => []
+                            "menu_items" => [],
                         ],
                     ],
                 ],
@@ -407,8 +407,15 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             ],
         ];
 
-        $serialization = $this->hier->serialize("sites", $site);
+        return $this->hier->serialize("sites", $site);
+    }
 
-        print_r($serialization);
+    public function test_cms_serialization()
+    {
+        $serialization = $this->serialize();
+
+        $this->assertEquals($serialization["aliases"][0]["_id"], $serialization["menus"][0]["menu_items"][0]["alias_id"]["_ref"]);
+        $this->assertEquals($serialization["tweaks"][0]["data"]["color_swatch_id"]["_ref"], $serialization["color_swatches"][0]["_id"]);
+        $this->assertEquals($serialization["pages"][1]["sections"][0]["blocks"][0]["data"]["current_resource_id"]["_ref"], $serialization["pages"][1]["sections"][0]["blocks"][0]["resources"][0]["_id"]);
     }
 }
