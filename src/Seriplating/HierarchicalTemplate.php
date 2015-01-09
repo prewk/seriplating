@@ -191,11 +191,32 @@ class HierarchicalTemplate implements HierarchicalInterface
             throw new HierarchicalCompositionException("Related entity '$relatedEntityName's data didn't exist where it was expected");
         }
 
+        // Look ahead at child for increment rules
+        $counters = [];
+        foreach ($this->templateRegistry[$relatedEntityName]->getTemplate() as $childField => $childRule) {
+            if ($childRule instanceof RuleInterface && $childRule->isIncrementing()) {
+                $incrementRule = $childRule->getValue();
+
+                $counters[] = [
+                    "field" => "@$childField",
+                    "current" => $incrementRule["start"],
+                    "increment" => $incrementRule["increment"],
+                ];
+            }
+        }
+
+
         // Deserialize the relations one-by-one
         $entityField = [];
         foreach ($data[$field] as $child) {
-            // @TODO: Sort order support
-            $entityField[] = $this->deserializeRelations($this->templateRegistry[$relatedEntityName], $child, $entityData);
+            // Add the increments
+            $entityDataWithIncrements = $entityData;
+            for ($i = 0; $i < count($counters); $i++) {
+                $entityDataWithIncrements[$counters[$i]["field"]] = $counters[$i]["current"];
+                $counters[$i]["current"] += $counters[$i]["increment"];
+            }
+
+            $entityField[] = $this->deserializeRelations($this->templateRegistry[$relatedEntityName], $child, $entityDataWithIncrements);
         }
 
         // Return to the parent recursive method

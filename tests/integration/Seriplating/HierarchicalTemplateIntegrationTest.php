@@ -112,6 +112,7 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
             "id" => $t->id("foos"),
             "top_id" => $t->inherits("id"),
             "val" => $t->value(),
+            "sort_order" => $t->increments(),
         ]);
 
         $barRepository = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");
@@ -155,8 +156,8 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
             "id" => 1,
             "val" => "lorem",
             "foos" => [
-                ["id" => 2, "val" => "ipsum", "top_id" => 1],
-                ["id" => 3, "val" => "foo", "top_id" => 1],
+                ["id" => 2, "val" => "ipsum", "top_id" => 1, "sort_order" => 0],
+                ["id" => 3, "val" => "foo", "top_id" => 1, "sort_order" => 1],
             ],
             "bars" => [
                 [
@@ -187,22 +188,26 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
             ->with([
                 "val" => "ipsum",
                 "top_id" => 1,
+                "sort_order" => 0,
             ])
             ->andReturn([
                 "id" => 2,
                 "val" => "ipsum",
                 "top_id" => 1,
+                "sort_order" => 0,
             ])
             ->shouldReceive("create")
             ->once()
             ->with([
                 "val" => "foo",
                 "top_id" => 1,
+                "sort_order" => 1,
             ])
             ->andReturn([
                 "id" => 3,
                 "val" => "foo",
                 "top_id" => 1,
+                "sort_order" => 1,
             ]);
 
         $barRepository
