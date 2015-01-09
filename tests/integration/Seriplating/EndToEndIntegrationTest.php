@@ -86,12 +86,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                 "Site" => $t->inherits("id"),
             ], $t->inherits("site_id")),
             "tweakable_type" => $t->value(),
-            "tweakable_id" => $t->conditions("tweakable_type", [
-                "Site" => $t->references("sites"),
-                "Page" => $t->references("pages"),
-                "Section" => $t->references("sections"),
-                "Block" => $t->references("blocks"),
-            ]),
+            "tweakable_id" => $t->inherits("id"),
             "definition" => $t->value(),
             "data" => $t->deep([
                 "/^color_swatch_id$/" => $t->references("color_swatches"),
@@ -150,10 +145,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                 "Site" => $t->inherits("id"),
             ], $t->inherits("site_id")),
             "sectionable_type" => $t->value(),
-            "sectionable_id" => $t->conditions("sectionable_type", [
-                "Page" => $t->references("pages"),
-                "Site" => $t->references("sites"),
-            ]),
+            "sectionable_id" => $t->inherits("id"),
             "type" => $t->value(),
             "name" => $t->value(),
             "position" => $t->value(),
@@ -361,6 +353,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                         ]
                     ],
                 ]],
+                ["id" => 3, "site_id" => 1, "name" => "The baz page", "sections" => []],
             ],
             "menus" => [
                 [
@@ -378,13 +371,23 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                             "menu_items" => [],
                         ],
                         [
-                            "id" => 1,
+                            "id" => 2,
                             "site_id" => 1,
                             "alias_id" => 2,
                             "menu_id" => 1,
                             "parent_id" => 0,
                             "sort_order" => 1,
-                            "menu_items" => [],
+                            "menu_items" => [
+                                [
+                                    "id" => 3,
+                                    "site_id" => 1,
+                                    "alias_id" => 3,
+                                    "menu_id" => 1,
+                                    "parent_id" => 2,
+                                    "sort_order" => 0,
+                                    "menu_items" => [],
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -403,6 +406,13 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                     "aliasable_type" => "Page",
                     "aliasable_id" => 2,
                     "alias" => "bar",
+                ],
+                [
+                    "id" => 3,
+                    "site_id" => 1,
+                    "aliasable_type" => "Page",
+                    "aliasable_id" => 3,
+                    "alias" => "baz",
                 ],
             ],
         ];
