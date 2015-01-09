@@ -257,9 +257,18 @@ class GenericDeserializer implements DeserializerInterface
 
             return $entityData;
         } else {
-            if ($template->isValue()) {
+            if (is_scalar($template)) {
+                // Scalar field, return it right away
+                return $template;
+            } elseif ($template->isValue()) {
                 // Value field, return the scope data
                 return $data;
+            } elseif (
+                $template->isInherited() ||
+                $template->isIncrementing() ||
+                $template->isHasMany()
+            ) {
+                return null;
             } elseif ($template->isReference()) {
                 // Reference field, save for putting into the id resolver later
                 $fallback = $template->getValue()["fallback"];
