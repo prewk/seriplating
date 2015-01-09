@@ -109,7 +109,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "id" => $t->id("menu_items"),
             "site_id" => $t->inherits("site_id"),
             "alias_id" => $t->references("aliases"),
-            "menu_id" => $t->inherits("id"), // @TODO: Add fallback support (1. "menu_id" 2. "id")
+            "menu_id" => $t->inherits("menu_id", "id"),
             "parent_id" => $t->references("menu_items"), // @TODO: Add fallback support (to 0)
             "sort_order" => $t->value(), // @TODO
             "menu_items" => $t->hasMany("menu_items"),

@@ -183,7 +183,7 @@ class GenericDeserializerTest extends SeriplatingTestCase
         ];
         $expectedEntityData = [
             "id" => 123,
-            "foo" => 0,
+            "foo_id" => 0,
         ];
 
         $this->repository

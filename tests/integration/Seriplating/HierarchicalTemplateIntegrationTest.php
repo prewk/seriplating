@@ -119,7 +119,9 @@ class HierarchicalTemplateIntegrationTest extends SeriplatingTestCase
             "id" => $t->id("bars"),
             "val" => $t->value(),
             "bazes" => $t->hasMany("bazes"),
-            "top_id" => $t->inherits("id"),
+            "top_id" => $t->conditions("val", [
+                "bar" => $t->inherits("id"),
+            ]),
         ]);
 
         $bazRepository = Mockery::mock("Prewk\\Seriplating\\Contracts\\RepositoryInterface");

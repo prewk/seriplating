@@ -7,6 +7,7 @@ use Prewk\Seriplating\Contracts\HierarchicalInterface;
 use Prewk\Seriplating\Contracts\IdResolverInterface;
 use Prewk\Seriplating\Contracts\RuleInterface;
 use Prewk\Seriplating\Errors\HierarchicalCompositionException;
+use Prewk\Seriplating\Errors\IntegrityException;
 
 class HierarchicalTemplate implements HierarchicalInterface
 {
@@ -147,7 +148,8 @@ class HierarchicalTemplate implements HierarchicalInterface
      * @param BidirectionalTemplateInterface $template Serializer/Deserializer/Template
      * @param array $data Scope data
      * @param array $inherited Inherited data
-     * @throws HierarchicalCompositionException on structure errors or missing fields
+     * @return array The deserialized entity data
+     * @throws IntegrityException if a conditions rule fails
      */
     protected function deserializeRelations(BidirectionalTemplateInterface $template, array $data, array $inherited = [])
     {
@@ -156,26 +158,80 @@ class HierarchicalTemplate implements HierarchicalInterface
 
         // Find relations
         foreach ($template->getTemplate() as $field => $rule) {
-            // @TODO: Support conditions here
-            if ($rule instanceof RuleInterface && $rule->isHasMany()) {
-                $relatedEntityName = $rule->getValue();
+            if ($rule instanceof RuleInterface) {
+                if ($rule->isConditions()) {
+                    // Conditions (Only supports one level)
+                    $conditions = $rule->getValue();
+                    $conditionsField = $conditions["field"];
+                    $cases = $conditions["cases"];
+                    $defaultCase = $conditions["defaultCase"];
 
-                if (!isset($this->templateRegistry[$relatedEntityName])) {
-                    throw new HierarchicalCompositionException("Related entity '$relatedEntityName' wasn't found in the registry");
-                }
+                    // Fail if the field doesn't exist at all
+                    if (!isset($data[$conditionsField])) {
+                        throw new IntegrityException("Missing field '$conditionsField' for use in conditions");
+                    }
 
-                if (!isset($data[$field])) {
-                    throw new HierarchicalCompositionException("Related entity '$relatedEntityName's data didn't exist where it was expected");
-                }
+                    // Switch through cases
+                    $hasManyRuleFound = false;
+                    $caseMatch = false;
+                    foreach ($cases as $case => $rule) {
+                        if ($data[$conditionsField] == $case) {
+                            $caseMatch = true;
+                            if ($rule->isHasMany()) {
+                                $entityData[$field] = $this->handleHasManyRule($rule, $data, $field, $entityData);
+                                $hasManyRuleFound = true;
+                                break;
+                            }
+                        }
+                    }
 
-                // Deserialize the relations one-by-one
-                $entityData[$field] = [];
-                foreach ($data[$field] as $child) {
-                    $entityData[$field][] = $this->deserializeRelations($this->templateRegistry[$relatedEntityName], $child, $entityData);
+                    // Default case
+                    if (!$caseMatch) {
+                        if (is_null($defaultCase)) {
+                            throw new IntegrityException("No conditions matched for field '$conditionsField");
+                        } elseif ($defaultCase->isHasMany()) {
+                            $entityData[$field] = $this->handleHasManyRule($rule, $data, $field, $entityData);
+                        }
+                    }
+                } elseif ($rule->isHasMany()) {
+                    $entityData[$field] = $this->handleHasManyRule($rule, $data, $field, $entityData);
                 }
             }
         }
 
         return $entityData;
+    }
+
+    /**
+     * Handle encountered hasMany rule
+     *
+     * @param RuleInterface $rule The hasMany Rule
+     * @param mixed $data Scope data
+     * @param string $field Owning field
+     * @param array $entityData All data
+     * @return array The modified data with inheritance sorted out
+     * @throws HierarchicalCompositionException if required entities weren't found
+     */
+    protected function handleHasManyRule(RuleInterface $rule, $data, $field, array $entityData)
+    {
+        // Has many
+        $relatedEntityName = $rule->getValue();
+
+        if (!isset($this->templateRegistry[$relatedEntityName])) {
+            throw new HierarchicalCompositionException("Related entity '$relatedEntityName' wasn't found in the registry");
+        }
+
+        if (!isset($data[$field])) {
+            throw new HierarchicalCompositionException("Related entity '$relatedEntityName's data didn't exist where it was expected");
+        }
+
+        // Deserialize the relations one-by-one
+        $entityField = [];
+        foreach ($data[$field] as $child) {
+            $entityField[] = $this->deserializeRelations($this->templateRegistry[$relatedEntityName], $child, $entityData);
+        }
+
+        // Return to the parent recursive method
+        return $entityField;
     }
 }

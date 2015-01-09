@@ -130,15 +130,97 @@ class GenericDeserializer implements DeserializerInterface
                     continue;
                 } elseif (
                     $content instanceof RuleInterface &&
+                    $content->isConditions()
+                ) {
+                    // If we've got a truthy condition that resolves to an inheritance, we need to inherit
+                    $value = $content->getValue();
+                    $conditionsField = $value["field"];
+                    $cases = $value["cases"];
+                    $defaultCase = $value["defaultCase"];
+
+                    if (!isset($this->toUnserialize[$conditionsField])) {
+                        throw new IntegrityException("Required conditions field '$conditionsField' missing'");
+                    }
+
+                    $fieldsToInherit = [];
+                    $recurseIntoRule = true;
+                    $caseMatch = false;
+                    foreach ($cases as $case => $rule) {
+                        if ($this->toUnserialize[$conditionsField] == $case) {
+                            $caseMatch = true;
+                            if ($rule->isInherited()) {
+                                $fieldsToInherit = $rule->getValue();
+                                $recurseIntoRule = false;
+                                break;
+                            }
+                        }
+                    }
+                    // Inheritance detected
+                    if (!$recurseIntoRule) {
+                        // Inherit value from parent
+                        $foundInheritance = null;
+
+                        // Go through prioritized inheritance array
+                        foreach ($fieldsToInherit as $fieldToInherit) {
+                            if (isset($this->inherited[$fieldToInherit])) {
+                                $foundInheritance = $this->inherited[$fieldToInherit];
+                                break;
+                            }
+                        }
+
+                        // If no inheritance was found
+                        if (is_null($foundInheritance)) {
+                            throw new IntegrityException("Required inheritance to field '$field' wasn't supplied");
+                        }
+
+                        $entityData[$field] = $foundInheritance;
+                        continue;
+                    }
+
+                    // If default case
+                    if (!$caseMatch) {
+                        if (is_null($defaultCase)) {
+                            throw new IntegrityException("No conditions matched, and no default case provided");
+                        } elseif ($defaultCase->isInherited()) {
+                            // Default case is an inheritance
+                            // Inherit value from parent
+                            $fieldsToInherit = $defaultCase->getValue();
+                            $foundInheritance = null;
+
+                            // Go through prioritized inheritance array
+                            foreach ($fieldsToInherit as $fieldToInherit) {
+                                if (isset($this->inherited[$fieldToInherit])) {
+                                    $foundInheritance = $this->inherited[$fieldToInherit];
+                                    break;
+                                }
+                            }
+
+                            // If no inheritance was found
+                            if (is_null($foundInheritance)) {
+                                throw new IntegrityException("Required inheritance to field '$field' wasn't supplied");
+                            }
+
+                            $entityData[$field] = $foundInheritance;
+                            continue;
+                        }
+                    }
+                } elseif (
+                    $content instanceof RuleInterface &&
                     $content->isInherited()
                 ) {
+                    // Inherit value from parent
                     $fieldsToInherit = $content->getValue();
                     $foundInheritance = null;
+
+                    // Go through prioritized inheritance array
                     foreach ($fieldsToInherit as $fieldToInherit) {
                         if (isset($this->inherited[$fieldToInherit])) {
                             $foundInheritance = $this->inherited[$fieldToInherit];
+                            break;
                         }
                     }
+
+                    // If no inheritance was found
                     if (is_null($foundInheritance)) {
                         throw new IntegrityException("Required inheritance to field '$field' wasn't supplied");
                     }
@@ -153,8 +235,11 @@ class GenericDeserializer implements DeserializerInterface
                     continue;
                 } elseif (!isset($data[$field])) {
                     throw new IntegrityException("Required field '$field' missing");
-                } else {
-                    $entityData[$field] = $this->walkDeserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
+                }
+
+                $value = $this->walkDeserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
+                if (!is_null($value)) {
+                    $entityData[$field] = $value;
                 }
             }
 
@@ -177,21 +262,15 @@ class GenericDeserializer implements DeserializerInterface
                 $cases = $value["cases"];
                 $defaultCase = $value["defaultCase"];
 
-                if (!isset($this->toUnserialize[$field])) {
-                    throw new IntegrityException("Required conditions field '$field' missing'");
-                }
-
+                // Go through the cases
                 foreach ($cases as $case => $rule) {
                     if ($this->toUnserialize[$field] == $case) {
                         return $this->walkDeserializedData($rule, $data, $dotPath);
                     }
                 }
 
-                if (is_null($defaultCase)) {
-                    throw new IntegrityException("No conditions matched, and no default case provided");
-                } else {
-                    return $this->walkDeserializedData($rule, $data, $dotPath);
-                }
+                // Default case
+                return $this->walkDeserializedData($defaultCase, $data, $dotPath);
             } elseif ($template->isDeep()) {
                 $finders = $template->getValue();
                 $newData = $data;

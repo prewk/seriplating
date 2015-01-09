@@ -5,6 +5,7 @@ namespace Prewk\Seriplating;
 use Illuminate\Support\Arr;
 use Prewk\Seriplating\Contracts\IdResolverInterface;
 use Prewk\Seriplating\Contracts\RepositoryInterface;
+use Prewk\Seriplating\Errors\IntegrityException;
 use SplObjectStorage;
 
 /**
@@ -42,13 +43,12 @@ class IdResolver implements IdResolverInterface
      *
      * @param int $internalId The internal id encountered
      * @param int|string $dbId The database id to resolve into
-     * @throws DataIntegrityException if the internal id already is bound to a value
-     * @return void
+     * @throws IntegrityException if the internal id already is bound to a value
      */
     public function bind($internalId, $dbId)
     {
         if (isset($this->internalIdToDbId[$internalId])) {
-            throw new DataIntegrityException("The internal id was already bound to a value");
+            throw new IntegrityException("The internal id was already bound to a value");
         }
 
         $this->internalIdToDbId[$internalId] = $dbId;
