@@ -40,7 +40,14 @@ class PreExistingEntityDeserializer implements DeserializerInterface
      */
     public function deserialize(array $template, RepositoryInterface $repository, array $toDeserialize, array $inherited = [], $primaryKeyField = "id")
     {
+        echo "DESERIALIZE RESOURCE\n";
         foreach ($template as $field => $rule) {
+            echo $field . "\n";
+            var_dump($rule instanceof RuleInterface);
+            var_dump($rule->isId());
+            var_dump(isset($toDeserialize["_id"]));
+            var_dump(isset($toDeserialize[$primaryKeyField]));
+            var_dump($toDeserialize);
             if (
                 $rule instanceof RuleInterface &&
                 $rule->isId() &&
