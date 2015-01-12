@@ -309,10 +309,10 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                 ]],
                 ["id" => 2, "site_id" => 1, "name" => "The bar page", "sections" => [
                     [
-                        "id" => 2,
+                        "id" => 3,
                         "site_id" => 1,
                         "sectionable_type" => "Page",
-                        "sectionable_id" => 1,
+                        "sectionable_id" => 2,
                         "type" => "block",
                         "name" => "foo",
                         "position" => "",
@@ -323,7 +323,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                                     "columns" => [
                                         [
                                             "blocks" => [
-                                                ["id" => 4],
+                                                ["id" => 5],
                                             ],
                                         ],
                                     ],
@@ -333,7 +333,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                         "resources" => [],
                         "blocks" => [
                             [
-                                "id" => 4,
+                                "id" => 5,
                                 "site_id" => 1,
                                 "type" => "image",
                                 "resources" => [
@@ -576,6 +576,82 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             ->shouldReceive("create")->with($blockCreate)->andReturn($blockCreated2)
             ->shouldReceive("create")->with($blockCreate)->andReturn($blockCreated3)
             ->shouldReceive("create")->with($blockCreate)->andReturn($blockCreated4);
+
+        // Page
+        $pageCreate = [
+            "site_id" => 1,
+            "name" => "The bar page",
+        ];
+        $pageCreated = ["id" => 2] + $pageCreate;
+        $this->pageRepo->shouldReceive("create")->once()->with($pageCreate)->andReturn($pageCreated);
+
+        // Section
+        $sectionCreate = [
+            "site_id" => 1,
+            "sectionable_type" => "Page",
+            "sectionable_id" => 2,
+            "type" => "block",
+            "name" => "foo",
+            "position" => "",
+            "sort_order" => 0,
+            "data" => [
+                "rows" => [
+                    [
+                        "columns" => [
+                            [
+                                "blocks" => [
+                                    ["id" => 0],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $sectionCreated = ["id" => 2] + $sectionCreate;
+        $sectionUpdate = [
+            "data" => [
+                "rows" => [
+                    [
+                        "columns" => [
+                            [
+                                "blocks" => [
+                                    ["id" => 4],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $sectionUpdated = array_merge($sectionCreated, $sectionUpdate);
+        $this->sectionRepo->shouldReceive("create")->once()->with($sectionCreate)->andReturn($sectionCreated)
+            ->shouldReceive("update")->once()->with($sectionUpdate)->andReturn($sectionUpdated);
+
+        // Block
+        $blockCreate = [
+            "site_id" => 1,
+            "type" => "image",
+            "data" => [
+                "resources" => [
+                    ["id" => 0, "transforms" => []],
+                ],
+                "current_resource_id" => 0,
+            ],
+        ];
+        $blockCreated = ["id" => 4] + $blockCreate;
+        $blockUpdate = [
+            "data" => [
+                "resources" => [
+                    ["id" => 1, "transforms" => []],
+                ],
+                "current_resource_id" => 1,
+            ],
+        ];
+        $blockUpdated = array_merge($blockCreated, $blockUpdate);
+        $this->blockRepo->shouldReceive("create")->with($blockCreate)->andReturn($blockCreated)
+            ->shouldReceive("update")->once()->with($blockUpdate)->andReturn($blockUpdated);
 
 
         return $this->hier->deserialize("sites", $this->serialize());
