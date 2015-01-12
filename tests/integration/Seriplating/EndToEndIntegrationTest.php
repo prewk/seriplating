@@ -109,9 +109,10 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "site_id" => $t->inherits("site_id"),
             "alias_id" => $t->references("aliases"),
             "menu_id" => $t->inherits("menu_id", "id"),
-            "parent_id" => $t->references("menu_items", 0),
+//            "parent_id" => $t->references("menu_items", 0),
+            "parent_id" => 0,
             "sort_order" => $t->increments(),
-            "menu_items" => $t->hasMany("menu_items"),
+//            "menu_items" => $t->hasMany("menu_items"),
         ]);
 
         // Alias
@@ -374,17 +375,17 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                             "menu_id" => 1,
                             "parent_id" => 0,
                             "sort_order" => 1,
-                            "menu_items" => [
-                                [
-                                    "id" => 3,
-                                    "site_id" => 1,
-                                    "alias_id" => 3,
-                                    "menu_id" => 1,
-                                    "parent_id" => 2,
-                                    "sort_order" => 0,
-                                    "menu_items" => [],
-                                ],
-                            ],
+//                            "menu_items" => [
+//                                [
+//                                    "id" => 3,
+//                                    "site_id" => 1,
+//                                    "alias_id" => 3,
+//                                    "menu_id" => 1,
+//                                    "parent_id" => 2,
+//                                    "sort_order" => 0,
+//                                    "menu_items" => [],
+//                                ],
+//                            ],
                         ],
                     ],
                 ],
@@ -670,7 +671,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         $menuCreated = ["id" => 1] + $menuCreate;
         $this->menuRepo->shouldReceive("create")->once()->with($menuCreate)->andReturn($menuCreated);
 
-        // Menu item (1, 3)
+        // Menu item
         $menuItemCreate = [
             "site_id" => 1,
             "alias_id" => 0,
@@ -678,22 +679,14 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "parent_id" => 0,
             "sort_order" => 0,
         ];
-        $menuItemCreated1 = ["id" => 1] + $menuItemCreate;
-        $menuItemCreated2 = ["id" => 3] + $menuItemCreate;
-        $menuItemUpdate1 = [
+        $menuItemCreated = ["id" => 1] + $menuItemCreate;
+        $menuItemUpdate = [
             "alias_id" => 1,
         ];
-        $menuItemUpdate2 = [
-            "alias_id" => 3,
-        ];
-        $menuItemUpdated1 = array_merge($menuItemCreated1, $menuItemUpdate1);
-        $menuItemUpdated2 = array_merge($menuItemCreated2, $menuItemUpdate2);
-        $this->menuItemRepo->shouldReceive("create")->once()->with($menuItemCreate)->andReturn($menuItemCreated1)
-            ->shouldReceive("update")->once()->with(1, $menuItemUpdate1)->andReturn($menuItemUpdated1)
-            ->shouldReceive("create")->once()->with($menuItemCreate)->andReturn($menuItemCreated2)
-            ->shouldReceive("update")->once()->with(3, $menuItemUpdate2)->andReturn($menuItemUpdated2);
+        $menuItemUpdated = array_merge($menuItemCreated, $menuItemUpdate);
+        $this->menuItemRepo->shouldReceive("create")->once()->with($menuItemCreate)->andReturn($menuItemCreated)
+            ->shouldReceive("update")->once()->with(1, $menuItemUpdate)->andReturn($menuItemUpdated);
 
-        // Menu item (2)
         $menuItemCreate = [
             "site_id" => 1,
             "alias_id" => 0,
@@ -708,6 +701,48 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         $menuItemUpdated = array_merge($menuItemCreated, $menuItemUpdate);
         $this->menuItemRepo->shouldReceive("create")->once()->with($menuItemCreate)->andReturn($menuItemCreated)
             ->shouldReceive("update")->once()->with(2, $menuItemUpdate)->andReturn($menuItemUpdated);
+
+        // Menu item (1, 2)
+//        $menuItemCreate = [
+//            "site_id" => 1,
+//            "alias_id" => 0,
+//            "menu_id" => 1,
+//            "parent_id" => 0,
+//            "sort_order" => 0,
+//        ];
+//        $menuItemCreated1 = ["id" => 1] + $menuItemCreate;
+//        $menuItemCreated2 = ["id" => 2] + $menuItemCreate;
+//        $menuItemUpdate1 = [
+//            "alias_id" => 1,
+//            "parent_id" => 0,
+//        ];
+//        $menuItemUpdate2 = [
+//            "alias_id" => 2,
+//            "parent_id" => 0,
+//        ];
+//        $menuItemUpdated1 = array_merge($menuItemCreated1, $menuItemUpdate1);
+//        $menuItemUpdated2 = array_merge($menuItemCreated2, $menuItemUpdate2);
+//        $this->menuItemRepo->shouldReceive("create")->once()->with($menuItemCreate)->andReturn($menuItemCreated1)
+//            ->shouldReceive("update")->once()->with(1, $menuItemUpdate1)->andReturn($menuItemUpdated1)
+//            ->shouldReceive("create")->once()->with($menuItemCreate)->andReturn($menuItemCreated2)
+//            ->shouldReceive("update")->once()->with(2, $menuItemUpdate2)->andReturn($menuItemUpdated2);
+
+        // Menu item (3)
+//        $menuItemCreate = [
+//            "site_id" => 1,
+//            "alias_id" => 0,
+//            "menu_id" => 1,
+//            "parent_id" => 0,
+//            "sort_order" => 1,
+//        ];
+//        $menuItemCreated = ["id" => 3] + $menuItemCreate;
+//        $menuItemUpdate = [
+//            "alias_id" => 3,
+//            "parent_id" => 2,
+//        ];
+//        $menuItemUpdated = array_merge($menuItemCreated, $menuItemUpdate);
+//        $this->menuItemRepo->shouldReceive("create")->once()->with($menuItemCreate)->andReturn($menuItemCreated)
+//            ->shouldReceive("update")->once()->with(3, $menuItemUpdate)->andReturn($menuItemUpdated);
 
         // Alias
         $aliasCreate = [

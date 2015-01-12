@@ -73,14 +73,8 @@ class GenericDeserializer implements DeserializerInterface
 
         // Create the entity via the repository
         $createdEntity = $repository->create($entityData);
-        echo "CREATED: " . json_encode($createdEntity) . "\n";
+//        echo "CREATED: " . json_encode($createdEntity) . "\n";
         $primaryKey = $createdEntity[$primaryKeyField];
-
-        if (json_encode($createdEntity, true) == '{"id":2,"site_id":1,"sectionable_type":"Page","sectionable_id":2,"type":"block","name":"foo","position":"","sort_order":0,"data":{"rows":[{"columns":[{"blocks":[{"id":0}]}]}]}}') {
-            var_dump($primaryKey);
-            print_r($this->updatesToDefer);
-            die;
-        }
 
         // Was an internal id to this entity caught?
         if (isset($this->idName)) {
@@ -282,7 +276,7 @@ class GenericDeserializer implements DeserializerInterface
             } elseif ($template->isReference()) {
                 // Reference field, save for putting into the id resolver later
                 $fallback = $template->getValue()["fallback"];
-                echo "DEFER: " . $data["_ref"] . "\n";
+//                echo "DEFER: " . $data["_ref"] . "\n";
                 $this->updatesToDefer[] = [
                     "internalId" => $data["_ref"],
                     "fullDotPath" => $dotPath,
@@ -325,7 +319,7 @@ class GenericDeserializer implements DeserializerInterface
                         }
 
                         if (preg_match($pattern, $innerDotPath) === 1) {
-                            echo "MATCH: " . $pattern . " " . $innerDotPath . "\n";
+//                            echo "MATCH: " . $pattern . " " . $innerDotPath . "\n";
                             Arr::set($newData, $innerDotPath, $this->walkDeserializedData($rule, $innerDotValue, $this->mergeDotPaths($dotPath, $innerDotPath)));
                         }
                     }

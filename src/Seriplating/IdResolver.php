@@ -47,7 +47,7 @@ class IdResolver implements IdResolverInterface
      */
     public function bind($internalId, $dbId)
     {
-        echo "BOUND $internalId TO $dbId\n";
+//        echo "BOUND $internalId TO $dbId\n";
         if (isset($this->internalIdToDbId[$internalId])) {
             throw new IntegrityException("The internal id was already bound to a value");
         }
@@ -114,7 +114,7 @@ class IdResolver implements IdResolverInterface
 
                 // If this is a deep field, try not to overwrite everything
                 if ($deepField) {
-                    echo "DEEP: " . $record["primaryKey"] . " " . $record["field"] . " $dbId\n";
+//                    echo "DEEP: " . $record["primaryKey"] . " " . $record["field"] . " $dbId\n";
                     // If the root field isn't set, set it..
                     if (!isset($update[$record["primaryKey"]][$rootField])) {
                         if (isset($record["initialEntityData"], $record["initialEntityData"][$rootField])) {
@@ -135,7 +135,7 @@ class IdResolver implements IdResolverInterface
 
             // Perform the updates
             foreach ($update as $primaryKey => $update) {
-                echo "PERFORM UPDATE ON $primaryKey: " . json_encode($update, true) . "\n";
+//                echo "PERFORM UPDATE ON $primaryKey: " . json_encode($update, true) . "\n";
                 $repository->update($primaryKey, $update);
             }
         }
