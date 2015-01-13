@@ -111,8 +111,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "menu_id" => $t->inherits("menu_id", "id"),
             "parent_id" => $t->references("menu_items", 0),
             "parent_id" => 0,
-            "sort_order" => $t->increments(),
-//            "menu_items" => $t->hasMany("menu_items"),
+            "sort_order" => $t->value(),
         ]);
 
         // Alias
@@ -374,6 +373,14 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                             "menu_id" => 1,
                             "parent_id" => 0,
                             "sort_order" => 1,
+                        ],
+                        [
+                            "id" => 3,
+                            "site_id" => 1,
+                            "alias_id" => 3,
+                            "menu_id" => 1,
+                            "parent_id" => 2,
+                            "sort_order" => 0,
                         ],
                     ],
                 ],
@@ -689,6 +696,21 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
         $menuItemUpdated = array_merge($menuItemCreated, $menuItemUpdate);
         $this->menuItemRepo->shouldReceive("create")->once()->with($menuItemCreate)->andReturn($menuItemCreated)
             ->shouldReceive("update")->once()->with(2, $menuItemUpdate)->andReturn($menuItemUpdated);
+
+        $menuItemCreate = [
+            "site_id" => 1,
+            "alias_id" => 0,
+            "menu_id" => 1,
+            "parent_id" => 0,
+            "sort_order" => 0,
+        ];
+        $menuItemCreated = ["id" => 3] + $menuItemCreate;
+        $menuItemUpdate = [
+            "alias_id" => 3,
+        ];
+        $menuItemUpdated = array_merge($menuItemCreated, $menuItemUpdate);
+        $this->menuItemRepo->shouldReceive("create")->once()->with($menuItemCreate)->andReturn($menuItemCreated)
+            ->shouldReceive("update")->once()->with(3, $menuItemUpdate)->andReturn($menuItemUpdated);
 
         // Alias
         $aliasCreate = [
