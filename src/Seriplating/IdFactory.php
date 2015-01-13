@@ -49,6 +49,7 @@ class IdFactory implements IdFactoryInterface
 
     protected function getUniqueId($entityName, $dbId)
     {
+//        echo "GET $entityName $dbId " . $this->uniqueId . "\n";
         return $entityName . "_" . $this->uniqueId++;
     }
 }

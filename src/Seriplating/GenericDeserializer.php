@@ -69,7 +69,7 @@ class GenericDeserializer implements DeserializerInterface
         $this->updatesToDefer = [];
 
         // Recurse the template and data
-        $entityData = $this->walkDeserializedData($template, $toDeserialize);
+        $entityData = $this->walkDeserializedData($template, $toDeserialize, "");
 
         // Create the entity via the repository
         $createdEntity = $repository->create($entityData);
