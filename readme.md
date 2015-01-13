@@ -3,6 +3,8 @@
 
 If you don't know what this does, you probably don't need it and shouldn't use it. :)
 
+__Note:__ This library will have composer install Laravel, which is pretty insane if you don't use Laravel. It uses an array helper class from there. I only use it in Laravel currently, so it made sense for me, even though it might not make sense for you. Sorry.
+
 First, an insane amount of preparations
 
 ````php
