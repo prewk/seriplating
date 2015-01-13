@@ -1,4 +1,4 @@
-(De)serialization templater
+(De)serialization templater [![Build Status](https://travis-ci.org/prewk/seriplating.svg?branch=master)](https://travis-ci.org/prewk/seriplating)
 ====================
 
 If you don't know what this does, you probably don't need it and shouldn't use it. :)
