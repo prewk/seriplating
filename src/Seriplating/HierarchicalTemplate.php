@@ -65,7 +65,7 @@ class HierarchicalTemplate implements HierarchicalInterface
     /**
      * Serialize from the given (de)serializer id entity name and downwards
      *
-     * @param string $entityName The registrered entity's name as provided via the id() rule
+     * @param string $entityName The registered entity's name as provided via the id() rule
      * @param array $unserializedTree Unserialized data
      * @return array Serialized data
      * @throws HierarchicalCompositionException on structure errors or missing fields

@@ -78,12 +78,10 @@ class IdResolver implements IdResolverInterface
      */
     public function resolve()
     {
-//        print_r($this->internalIdToDbId);
         // Iterate through the deferred updates
         foreach ($this->deferred as $repository) {
             // Some SplObjectStorage weirdness
             $deferredRecords = $this->deferred[$repository];
-//            print_r($deferredRecords);
             // Construct a full update array for this repository, index by primary key
             $update = [];
             foreach ($deferredRecords as $record) {
@@ -114,7 +112,6 @@ class IdResolver implements IdResolverInterface
 
                 // If this is a deep field, try not to overwrite everything
                 if ($deepField) {
-//                    echo "DEEP: " . $record["primaryKey"] . " " . $record["field"] . " $dbId\n";
                     // If the root field isn't set, set it..
                     if (!isset($update[$record["primaryKey"]][$rootField])) {
                         if (isset($record["initialEntityData"], $record["initialEntityData"][$rootField])) {
@@ -127,15 +124,19 @@ class IdResolver implements IdResolverInterface
                     }
                 }
 
+//                // @TODO: Optimization, sometimes fallbacks are used and no update needs to be made at all
+//                if (isset($record["initialEntityData"], $record["initialEntityData"][$record["field"]]) &&
+//                    $record["initialEntityData"][$record["field"]] === $dbId
+//                ) {
+//
+//                }
+
                 // Now, update with the whole deep dot notation, using the resolved db id as a value
-//                echo "SET " . $record["primaryKey"] . "." . $record["field"] . ": $dbId\n";
                 Arr::set($update, $record["primaryKey"] . "." . $record["field"], $dbId);
-//                print_r($update);
             }
 
             // Perform the updates
             foreach ($update as $primaryKey => $update) {
-//                echo "PERFORM UPDATE ON $primaryKey: " . json_encode($update, true) . "\n";
                 $repository->update($primaryKey, $update);
             }
         }
@@ -180,11 +181,6 @@ class IdResolver implements IdResolverInterface
         if (!isset($this->deferred[$repository])) {
             $this->deferred[$repository] = [];
         }
-
-//        if ($field === "data.rows.0.columns.0.blocks.0.id") {
-//            echo "####################### $primaryKey\n";
-//        }
-//        echo "DEFERRED $internalId, $primaryKey $field\n";
 
         $records = $this->deferred[$repository];
 

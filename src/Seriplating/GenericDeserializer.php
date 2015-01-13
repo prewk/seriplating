@@ -73,7 +73,6 @@ class GenericDeserializer implements DeserializerInterface
 
         // Create the entity via the repository
         $createdEntity = $repository->create($entityData);
-//        echo "CREATED: " . json_encode($createdEntity) . "\n";
         $primaryKey = $createdEntity[$primaryKeyField];
 
         // Was an internal id to this entity caught?
@@ -276,7 +275,6 @@ class GenericDeserializer implements DeserializerInterface
             } elseif ($template->isReference()) {
                 // Reference field, save for putting into the id resolver later
                 $fallback = $template->getValue()["fallback"];
-//                echo "DEFER: " . $data["_ref"] . "\n";
                 $this->updatesToDefer[] = [
                     "internalId" => $data["_ref"],
                     "fullDotPath" => $dotPath,
@@ -319,7 +317,6 @@ class GenericDeserializer implements DeserializerInterface
                         }
 
                         if (preg_match($pattern, $innerDotPath) === 1) {
-//                            echo "MATCH: " . $pattern . " " . $innerDotPath . "\n";
                             Arr::set($newData, $innerDotPath, $this->walkDeserializedData($rule, $innerDotValue, $this->mergeDotPaths($dotPath, $innerDotPath)));
                         }
                     }
