@@ -249,13 +249,13 @@ class GenericDeserializer implements DeserializerInterface
                     // Scalar value, just use it and move on
                     $entityData[$field] = $content;
                     continue;
-                } elseif (!isset($data[$field])) {
+                } elseif (!array_key_exists($field, $data)) {
                     throw new IntegrityException("Required field '$field' missing");
                 }
 
-                $value = $this->walkDeserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
-                if (!is_null($value)) {
-                    $entityData[$field] = $value;
+                $fieldValue = $this->walkDeserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
+                if ($fieldValue !== ["_null"]) {
+                    $entityData[$field] = $fieldValue;
                 }
             }
 
@@ -272,7 +272,7 @@ class GenericDeserializer implements DeserializerInterface
                 $template->isIncrementing() ||
                 $template->isHasMany()
             ) {
-                return null;
+                return ["_null"];
             } elseif ($template->isReference()) {
                 // Reference field, save for putting into the id resolver later
                 $fallback = $template->getValue()["fallback"];

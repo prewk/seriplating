@@ -245,7 +245,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
                         "sectionable_id" => 1,
                         "type" => "block",
                         "name" => "foo",
-                        "position" => "",
+                        "position" => null,
                         "sort_order" => 0,
                         "data" => [
                             "rows" => [
@@ -507,7 +507,7 @@ class EndToEndIntegrationTest extends SeriplatingTestCase
             "sectionable_id" => 1,
             "type" => "block",
             "name" => "foo",
-            "position" => "",
+            "position" => null,
             "sort_order" => 0,
             "data" => [
                 "rows" => [

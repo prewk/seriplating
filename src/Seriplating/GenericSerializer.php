@@ -95,12 +95,12 @@ class GenericSerializer implements SerializerInterface
                 ) {
                     $serialized["_id"] = $this->idFactory->get($content->getValue(), $data[$field]);
                     continue;
-                } elseif (!isset($data[$field])) {
+                } elseif (!array_key_exists($field, $data)) {
                     throw new IntegrityException("Required field '$field' missing");
                 }
 
                 $fieldValue = $this->walkUnserializedData($content, $data[$field], $this->mergeDotPaths($dotPath, $field));
-                if (!is_null($fieldValue)) {
+                if ($fieldValue !== ["_null"]) {
                     $serialized[$field] = $fieldValue;
                 }
             }
@@ -116,7 +116,7 @@ class GenericSerializer implements SerializerInterface
                 $template->isIncrementing() ||
                 $template->isHasMany()
             ) {
-                return null;
+                return ["_null"];
             } elseif ($template->isReference()) {
                 if ($template->isCollection()) {
                     $refs = [];
