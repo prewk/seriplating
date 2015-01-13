@@ -17,7 +17,7 @@ class HierarchicalTemplate implements HierarchicalInterface
     protected $templateRegistry = [];
 
     /**
-     * @var
+     * @var IdResolverInterface
      */
     protected $idResolver;
 
