@@ -5,7 +5,7 @@ If you don't know what this does, you probably don't need it and shouldn't use i
 
 First, an insane amount of preparations
 
-````
+````php
 <?php
 use Prewk\Seriplating\GenericDeserializer;
 use Prewk\Seriplating\GenericSerializer;
