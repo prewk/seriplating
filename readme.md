@@ -3,7 +3,7 @@
 
 If you don't know what this does, you probably don't need it and shouldn't use it. :)
 
-__Note:__ This library will have composer install Laravel, which is pretty insane if you don't use Laravel. It uses an array helper class from there. I only use it in Laravel currently, so it made sense for me, even though it might not make sense for you. Sorry.
+__Note:__ This library will have composer install Laravel, which is pretty insane if you don't use Laravel. It uses array and pluralization helper classes from there. I only use it in Laravel currently, so it made sense for me, even though it might not make sense for you. Sorry.
 
 First, an insane amount of preparations
 
@@ -175,6 +175,20 @@ $template2 = [
     "foo_id" => $t->references("foos"),
     "sort_order" => $t->increments(),
 ];
+````
+
+## Formatters
+````php
+<?php
+use Prewk\Seriplating\Formatters\XmlFormatter;
+
+$serialization = ...
+
+$xmlFormatter = new XmlFormatter;
+
+file_put_contents("serialized.xml", $xmlFormatter->formatSerialized($serialization));
+
+$serialization = $xmlFormatter->unformatSerialized(file_get_contents("serialized.xml"));
 ````
 
 ## Known issues

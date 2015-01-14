@@ -59,7 +59,6 @@ class XmlFormatter implements FormatterInterface
         }
     }
 
-
     /**
      * Convert a formatted serialization
      *

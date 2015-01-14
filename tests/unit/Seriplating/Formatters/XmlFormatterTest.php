@@ -28,7 +28,7 @@ class XmlFormatterTest extends SeriplatingTestCase
     public function test_unformatSerialized()
     {
         $formatter = new XmlFormatter;
-        
+
         $xmlString = $formatter->formatSerialized($this->getSerialization());
         $serialization = $formatter->unformatSerialized($xmlString);
 
