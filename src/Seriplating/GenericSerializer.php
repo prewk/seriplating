@@ -80,22 +80,26 @@ class GenericSerializer implements SerializerInterface
             $serialized = [];
 
             foreach ($template as $field => $content) {
-                if (
-                    $content instanceof RuleInterface &&
-                    (
+                if ($content instanceof RuleInterface) {
+                    if (
                         (!isset($data[$field]) && $content->isOptional()) ||
                         $content->isHasMany() ||
                         $content->isInherited()
-                    )
-                ) {
-                    continue;
-                } elseif (
-                    $content instanceof RuleInterface &&
-                    $content->isId()
-                ) {
-                    $serialized["_id"] = $this->idFactory->get($content->getValue(), $data[$field]);
-                    continue;
+                    ) {
+                        // Skip serializing if field is missing & optional, or a hasMany field, or field is inherited
+                        continue;
+                    } elseif (
+                        $content->isId()
+                    ) {
+                        // If it's an id field set the _id and keep going
+                        $serialized["_id"] = $this->idFactory->get($content->getValue(), $data[$field]);
+                        continue;
+                    } elseif (!array_key_exists($field, $data)) {
+                        // Missing field with no excuses
+                        throw new IntegrityException("Required field '$field' missing");
+                    }
                 } elseif (!array_key_exists($field, $data)) {
+                    // Missing field with no excuses
                     throw new IntegrityException("Required field '$field' missing");
                 }
 

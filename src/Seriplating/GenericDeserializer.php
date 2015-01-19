@@ -120,75 +120,46 @@ class GenericDeserializer implements DeserializerInterface
             $entityData = [];
 
             foreach ($template as $field => $content) {
-                if (
-                    $content instanceof RuleInterface &&
-                    $content->isId() &&
-                    isset($data["_id"])
-                ) {
-                    $this->idName = $data["_id"];
-                    continue;
-                } elseif (
-                    $content instanceof RuleInterface &&
-                    $content->isHasMany()
-                ) {
-                    continue;
-                } elseif (
-                    $content instanceof RuleInterface &&
-                    $content->isConditions()
-                ) {
-                    // If we've got a truthy condition that resolves to an inheritance, we need to inherit
-                    $value = $content->getValue();
-                    $conditionsField = $value["field"];
-                    $cases = $value["cases"];
-                    $defaultCase = $value["defaultCase"];
-
-                    if (!isset($this->toUnserialize[$conditionsField])) {
-                        throw new IntegrityException("Required conditions field '$conditionsField' missing'");
-                    }
-
-                    $fieldsToInherit = [];
-                    $recurseIntoRule = true;
-                    $caseMatch = false;
-                    foreach ($cases as $case => $rule) {
-                        if ($this->toUnserialize[$conditionsField] == $case) {
-                            $caseMatch = true;
-                            if ($rule instanceof RuleInterface && $rule->isInherited()) {
-                                $fieldsToInherit = $rule->getValue();
-                                $recurseIntoRule = false;
-                                break;
-                            }
-                        }
-                    }
-                    // Inheritance detected
-                    if (!$recurseIntoRule) {
-                        // Inherit value from parent
-                        $foundInheritance = null;
-
-                        // Go through prioritized inheritance array
-                        foreach ($fieldsToInherit as $fieldToInherit) {
-                            if (isset($this->inherited[$fieldToInherit])) {
-                                $foundInheritance = $this->inherited[$fieldToInherit];
-                                break;
-                            }
-                        }
-
-                        // If no inheritance was found
-                        if (is_null($foundInheritance)) {
-                            throw new IntegrityException("Required inheritance to field '$field' wasn't supplied");
-                        }
-
-                        $entityData[$field] = $foundInheritance;
+                if ($content instanceof RuleInterface) {
+                    if (
+                        $content->isId() &&
+                        isset($data["_id"])
+                    ) {
+                        $this->idName = $data["_id"];
                         continue;
-                    }
+                    } elseif (
+                        $content->isHasMany()
+                    ) {
+                        continue;
+                    } elseif (
+                        $content->isConditions()
+                    ) {
+                        // If we've got a truthy condition that resolves to an inheritance, we need to inherit
+                        $value = $content->getValue();
+                        $conditionsField = $value["field"];
+                        $cases = $value["cases"];
+                        $defaultCase = $value["defaultCase"];
 
-                    // If default case
-                    if (!$caseMatch) {
-                        if (is_null($defaultCase)) {
-                            throw new IntegrityException("No conditions matched, and no default case provided");
-                        } elseif ($defaultCase->isInherited()) {
-                            // Default case is an inheritance
+                        if (!isset($this->toUnserialize[$conditionsField])) {
+                            throw new IntegrityException("Required conditions field '$conditionsField' missing'");
+                        }
+
+                        $fieldsToInherit = [];
+                        $recurseIntoRule = true;
+                        $caseMatch = false;
+                        foreach ($cases as $case => $rule) {
+                            if ($this->toUnserialize[$conditionsField] == $case) {
+                                $caseMatch = true;
+                                if ($rule instanceof RuleInterface && $rule->isInherited()) {
+                                    $fieldsToInherit = $rule->getValue();
+                                    $recurseIntoRule = false;
+                                    break;
+                                }
+                            }
+                        }
+                        // Inheritance detected
+                        if (!$recurseIntoRule) {
                             // Inherit value from parent
-                            $fieldsToInherit = $defaultCase->getValue();
                             $foundInheritance = null;
 
                             // Go through prioritized inheritance array
@@ -207,43 +178,71 @@ class GenericDeserializer implements DeserializerInterface
                             $entityData[$field] = $foundInheritance;
                             continue;
                         }
-                    }
-                } elseif (
-                    $content instanceof RuleInterface &&
-                    $content->isInherited()
-                ) {
-                    // Inherit value from parent
-                    $fieldsToInherit = $content->getValue();
-                    $foundInheritance = null;
 
-                    // Go through prioritized inheritance array
-                    foreach ($fieldsToInherit as $fieldToInherit) {
-                        if (isset($this->inherited[$fieldToInherit])) {
-                            $foundInheritance = $this->inherited[$fieldToInherit];
-                            break;
+                        // If default case
+                        if (!$caseMatch) {
+                            if (is_null($defaultCase)) {
+                                throw new IntegrityException("No conditions matched, and no default case provided");
+                            } elseif ($defaultCase->isInherited()) {
+                                // Default case is an inheritance
+                                // Inherit value from parent
+                                $fieldsToInherit = $defaultCase->getValue();
+                                $foundInheritance = null;
+
+                                // Go through prioritized inheritance array
+                                foreach ($fieldsToInherit as $fieldToInherit) {
+                                    if (isset($this->inherited[$fieldToInherit])) {
+                                        $foundInheritance = $this->inherited[$fieldToInherit];
+                                        break;
+                                    }
+                                }
+
+                                // If no inheritance was found
+                                if (is_null($foundInheritance)) {
+                                    throw new IntegrityException("Required inheritance to field '$field' wasn't supplied");
+                                }
+
+                                $entityData[$field] = $foundInheritance;
+                                continue;
+                            }
                         }
-                    }
+                    } elseif (
+                        $content->isInherited()
+                    ) {
+                        // Inherit value from parent
+                        $fieldsToInherit = $content->getValue();
+                        $foundInheritance = null;
 
-                    // If no inheritance was found
-                    if (is_null($foundInheritance)) {
-                        throw new IntegrityException("Required inheritance to field '$field' wasn't supplied");
-                    }
+                        // Go through prioritized inheritance array
+                        foreach ($fieldsToInherit as $fieldToInherit) {
+                            if (isset($this->inherited[$fieldToInherit])) {
+                                $foundInheritance = $this->inherited[$fieldToInherit];
+                                break;
+                            }
+                        }
 
-                    $entityData[$field] = $foundInheritance;
-                    continue;
-                } elseif (
-                    $content instanceof RuleInterface &&
-                    $content->isIncrementing()
-                ) {
-                    // Inherit incrementing value from parent
-                    $entityData[$field] = $this->inherited["@$field"];
-                    continue;
-                } elseif (
-                    !isset($data[$field]) &&
-                    $content instanceof RuleInterface &&
-                    $content->isOptional()
-                ) {
-                    continue;
+                        // If no inheritance was found
+                        if (is_null($foundInheritance)) {
+                            throw new IntegrityException("Required inheritance to field '$field' wasn't supplied");
+                        }
+
+                        $entityData[$field] = $foundInheritance;
+                        continue;
+                    } elseif (
+                        $content->isIncrementing()
+                    ) {
+                        // Inherit incrementing value from parent
+                        $entityData[$field] = $this->inherited["@$field"];
+                        continue;
+                    } elseif (
+                        !isset($data[$field]) &&
+                        $content->isOptional()
+                    ) {
+                        // Optional - and missing - value encountered
+                        continue;
+                    } elseif (!array_key_exists($field, $data)) {
+                        throw new IntegrityException("Required field '$field' missing");
+                    }
                 } elseif (is_scalar($content)) {
                     // Scalar value, just use it and move on
                     $entityData[$field] = $content;
