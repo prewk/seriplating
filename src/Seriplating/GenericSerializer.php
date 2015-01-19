@@ -112,17 +112,22 @@ class GenericSerializer implements SerializerInterface
             return $serialized;
         } else {
             if (is_scalar($template)) {
+                // Scalar value, just save it as is
                 return $template;
             } elseif ($template->isValue()) {
+                // Regular value
                 return $data;
             } elseif (
                 $template->isInherited() ||
                 $template->isIncrementing() ||
                 $template->isHasMany()
             ) {
+                // Skip fields with inheritance, increments or hasMany
                 return ["_null"];
             } elseif ($template->isReference()) {
+                // Reference
                 if ($template->isCollection()) {
+                    // An array of references
                     $refs = [];
 
                     foreach ($data as $dbId) {
@@ -131,9 +136,11 @@ class GenericSerializer implements SerializerInterface
 
                     return $refs;
                 } else {
+                    // A single reference
                     return ["_ref" => $this->idFactory->get($template->getValue()["entityName"], $data)];
                 }
             } elseif ($template->isConditions()) {
+                // Conditions rule
                 $value = $template->getValue();
                 $field = $value["field"];
                 $cases = $value["cases"];
@@ -155,6 +162,7 @@ class GenericSerializer implements SerializerInterface
                     return $this->walkUnserializedData($rule, $data, $dotPath);
                 }
             } elseif ($template->isDeep()) {
+                // Regexp deep rule
                 $finders = $template->getValue();
                 $newData = $data;
                 $dotData = Arr::dot($data);
