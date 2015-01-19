@@ -11,7 +11,7 @@ interface RepositoryInterface
      * Create an entity
      *
      * @param array $data Data to create with
-     * @return mixed The primary key of the created entity
+     * @return mixed The created entity
      */
     public function create(array $data);
 
