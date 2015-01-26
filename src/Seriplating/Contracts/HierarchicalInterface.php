@@ -28,7 +28,7 @@ interface HierarchicalInterface
      *
      * @param string $entityName The registrered entity's name as provided via the id() rule
      * @param array $serializedTree Serialized data
-     * @return Unserialized entity data
+     * @return array Unserialized entity data
      */
     public function deserialize($entityName, array $serializedTree);
 }
