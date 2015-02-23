@@ -27,14 +27,14 @@ interface IdResolverInterface
      * Save an encountered reference for later resolution
      *
      * @param mixed $internalId The internal id reference dependency needed to resolve
-     * @param RepositoryInterface $repository Target repository
+     * @param mixed $repository Target repository
      * @param mixed $primaryKey Primary key used for updating the repository
      * @param string $field Field, in dot notation, to receive the update
      * @param array $initialEntityData Initial entity data used to not overwrite "deep" fields
      * @param null $fallback Optional fallback instead of exception when relation couldn't be resolved
      * @return void
      */
-    public function defer($internalId, RepositoryInterface $repository, $primaryKey, $field, $initialEntityData = [], $fallback = null);
+    public function defer($internalId, $repository, $primaryKey, $field, $initialEntityData = [], $fallback = null);
 
     /**
      * Resolve the saved encountered references by performing the deferred updates
