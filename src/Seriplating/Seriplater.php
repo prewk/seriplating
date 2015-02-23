@@ -23,7 +23,7 @@ class Seriplater implements SeriplaterInterface
     protected $nextIsCollection = false;
     protected $nextIsOptional = false;
 
-    public function __construct(RuleInterface $rule)
+    public function __construct(Rule $rule)
     {
         $this->rule = $rule;
     }
