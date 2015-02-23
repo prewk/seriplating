@@ -23,7 +23,7 @@ class SeriplatingTemplate implements BidirectionalTemplateInterface
     protected $genericDeserializer;
 
     /**
-     * @var RepositoryInterface
+     * @var mixed
      */
     protected $repository;
 
@@ -35,13 +35,13 @@ class SeriplatingTemplate implements BidirectionalTemplateInterface
     /**
      * @param SerializerInterface $genericSerializer
      * @param DeserializerInterface $genericDeserializer
-     * @param RepositoryInterface $repository
+     * @param mixed $repository
      * @param array $template
      */
     public function __construct(
         SerializerInterface $genericSerializer,
         DeserializerInterface $genericDeserializer,
-        RepositoryInterface $repository,
+        $repository,
         array $template
     )
     {
