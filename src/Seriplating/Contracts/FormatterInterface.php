@@ -10,10 +10,10 @@ interface FormatterInterface
     /**
      * Format a serialization
      *
-     * @param string $serialized Serialization
+     * @param array $serialized Serialization
      * @return string Formatted serialization
      */
-    public function formatSerialized($serialized);
+    public function formatSerialized(array $serialized);
 
     /**
      * Convert a formatted serialization

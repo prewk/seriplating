@@ -14,10 +14,10 @@ class XmlFormatter implements FormatterInterface
     /**
      * Format a serialization
      *
-     * @param string $serialized Serialization
+     * @param array $serialized Serialization
      * @return string Formatted serialization
      */
-    public function formatSerialized($serialized)
+    public function formatSerialized(array $serialized)
     {
         $xml = new SimpleXMLElement("<root />");
         $this->formatTree($xml, $serialized, $xml);
@@ -25,7 +25,7 @@ class XmlFormatter implements FormatterInterface
         return $xml->asXML();
     }
 
-    private function formatTree(SimpleXMLElement $xml, $serialized, SimpleXMLElement $rootNode = null, $parentName = null, SimpleXMLElement $parentNode = null)
+    private function formatTree(SimpleXMLElement $xml, array $serialized, SimpleXMLElement $rootNode = null, $parentName = null, SimpleXMLElement $parentNode = null)
     {
         foreach ($serialized as $key => $value) {
             if (is_array($value)) {
