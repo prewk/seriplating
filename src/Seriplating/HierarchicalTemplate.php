@@ -104,12 +104,15 @@ class HierarchicalTemplate implements HierarchicalInterface
                     throw new HierarchicalCompositionException("Related entity '$relatedEntityName' wasn't found in the registry");
                 }
 
-                if (!isset($data[$field])) {
+                $serialization[$field] = [];
+
+                if (!isset($data[$field]) && $rule->isOptional()) {
+                    continue;
+                } else if (!isset($data[$field])) {
                     throw new HierarchicalCompositionException("Related entity '$relatedEntityName's data didn't exist where it was expected");
                 }
 
                 // Serialize the relations one-by-one
-                $serialization[$field] = [];
                 foreach ($data[$field] as $child) {
                     $serialization[$field][] = $this->serializeRelations($this->templateRegistry[$relatedEntityName], $child);
                 }
