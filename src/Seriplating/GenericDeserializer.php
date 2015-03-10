@@ -331,11 +331,11 @@ class GenericDeserializer implements DeserializerInterface
     /**
      * Tell the id resolver to defer our caught updates until they can be resolved
      *
-     * @param RepositoryInterface $repository Target repository
+     * @param mixed $repository Target repository
      * @param mixed $primaryKey Primary key of the created entity
      * @param array $createdEntity The created entity
      */
-    protected function deferUpdates(RepositoryInterface $repository, $primaryKey, array $createdEntity)
+    protected function deferUpdates($repository, $primaryKey, array $createdEntity)
     {
         foreach ($this->updatesToDefer as $updateToDefer) {
             $this->idResolver->defer($updateToDefer["internalId"], $repository, $primaryKey, $updateToDefer["fullDotPath"], $createdEntity, $updateToDefer["fallback"]);
