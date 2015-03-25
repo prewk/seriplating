@@ -211,15 +211,18 @@ class HierarchicalTemplate implements HierarchicalInterface
 
         // Deserialize the relations one-by-one
         $entityField = [];
-        foreach ($data[$field] as $child) {
-            // Add the increments
-            $entityDataWithIncrements = $entityData;
-            for ($i = 0; $i < count($counters); $i++) {
-                $entityDataWithIncrements[$counters[$i]["field"]] = $counters[$i]["current"];
-                $counters[$i]["current"] += $counters[$i]["increment"];
-            }
+        
+        if (!is_array($data[$field])) {
+            foreach ($data[$field] as $child) {
+                // Add the increments
+                $entityDataWithIncrements = $entityData;
+                for ($i = 0; $i < count($counters); $i++) {
+                    $entityDataWithIncrements[$counters[$i]["field"]] = $counters[$i]["current"];
+                    $counters[$i]["current"] += $counters[$i]["increment"];
+                }
 
-            $entityField[] = $this->deserializeRelations($this->templateRegistry[$relatedEntityName], $child, $entityDataWithIncrements);
+                $entityField[] = $this->deserializeRelations($this->templateRegistry[$relatedEntityName], $child, $entityDataWithIncrements);
+            }
         }
 
         // Return to the parent recursive method
