@@ -238,16 +238,24 @@ class GenericDeserializerTest extends SeriplatingTestCase
 
         $template = [
             "foo_id" => $t->references("foos"),
+            "bar_id" => $t->nullable()->references("foos"),
+            "baz_id" => $t->nullable()->references("foos"),
         ];
         $serialized = [
             "foo_id" => ["_ref" => "foos_0"],
+            "bar_id" => ["_ref" => "foos_0"],
+            "baz_id" => null,
         ];
         $expected = [
             "foo_id" => 0,
+            "bar_id" => 0,
+            "baz_id" => null,
         ];
         $expectedEntityData = [
             "id" => 123,
             "foo_id" => 0,
+            "bar_id" => 0,
+            "baz_id" => null,
         ];
 
         $this->repository
@@ -261,10 +269,16 @@ class GenericDeserializerTest extends SeriplatingTestCase
             ->once()
             ->with("foos_0", $this->repository, 123, "foo_id", $expectedEntityData, null);
 
+        $this->idResolver
+            ->shouldReceive("defer")
+            ->once()
+            ->with("foos_0", $this->repository, 123, "bar_id", $expectedEntityData, null);
+
         $deser = new GenericDeserializer($this->idResolver);
         $entityData = $deser->deserialize($template, $this->repository, $serialized);
 
         $this->assertEquals($expectedEntityData, $entityData);
+        $this->assertNull($entityData["baz_id"]);
     }
 
     public function test_conditions()
