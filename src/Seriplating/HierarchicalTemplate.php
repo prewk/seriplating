@@ -211,8 +211,8 @@ class HierarchicalTemplate implements HierarchicalInterface
 
         // Deserialize the relations one-by-one
         $entityField = [];
-        
-        if (!is_array($data[$field])) {
+
+        if (is_array($data[$field])) {
             foreach ($data[$field] as $child) {
                 // Add the increments
                 $entityDataWithIncrements = $entityData;
