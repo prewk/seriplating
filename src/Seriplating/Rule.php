@@ -89,6 +89,14 @@ class Rule implements RuleInterface
     /**
      * @return bool
      */
+    public function isNullable()
+    {
+        return (Seriplater::NULLABLE & $this->type) !== 0;
+    }
+
+    /**
+     * @return bool
+     */
     public function isCollection()
     {
         return (Seriplater::COLLECTION_OF & $this->type) !== 0;

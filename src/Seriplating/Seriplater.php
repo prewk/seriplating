@@ -17,11 +17,13 @@ class Seriplater implements SeriplaterInterface
     const HAS_MANY = 128;
     const INHERITS = 256;
     const INCREMENTS = 512;
+    const NULLABLE = 1024;
 
     protected $rule;
 
     protected $nextIsCollection = false;
     protected $nextIsOptional = false;
+    protected $nextIsNullable = false;
 
     public function __construct(Rule $rule)
     {
@@ -53,6 +55,18 @@ class Seriplater implements SeriplaterInterface
         return $this;
     }
 
+    /**
+     * Consecutive rule will refer to a nullable field (Only works for references)
+     *
+     * @return $this
+     */
+    public function nullable()
+    {
+        $this->nextIsNullable = true;
+
+        return $this;
+    }
+
     protected function applyModifiers($type)
     {
         if ($this->nextIsCollection) {
@@ -63,6 +77,11 @@ class Seriplater implements SeriplaterInterface
         if ($this->nextIsOptional) {
             $type += self::OPTIONAL;
             $this->nextIsOptional = false;
+        }
+
+        if ($this->nextIsNullable) {
+            $type += self::NULLABLE;
+            $this->nextIsNullable = false;
         }
 
         return $type;

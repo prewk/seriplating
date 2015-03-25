@@ -126,6 +126,17 @@ class GenericSerializer implements SerializerInterface
                 return ["_null"];
             } elseif ($template->isReference()) {
                 // Reference
+                if ($data === null) {
+                    // Reference to a null value
+                    if ($template->isNullable()) {
+                        // Allowed
+                        return null;
+                    } else {
+                        // Not allowed
+                        throw new IntegrityException("Encountered NULL when parsing a '" . $template->getValue()["entityName"] . "'' reference");
+                    }
+                }
+
                 if ($template->isCollection()) {
                     // An array of references
                     $refs = [];

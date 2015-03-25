@@ -273,6 +273,18 @@ class GenericDeserializer implements DeserializerInterface
                 return ["_null"];
             } elseif ($template->isReference()) {
                 // Reference field, save for putting into the id resolver later
+
+                if ($data === null) {
+                    // Reference to a null value
+                    if ($template->isNullable()) {
+                        // Allowed
+                        return null;
+                    } else {
+                        // Not allowed
+                        throw new IntegrityException("Encountered NULL when deserializing a reference at $dotPath");
+                    }
+                }
+
                 $fallback = $template->getValue()["fallback"];
                 $this->updatesToDefer[] = [
                     "internalId" => $data["_ref"],

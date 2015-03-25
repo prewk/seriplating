@@ -162,6 +162,7 @@ class GenericSerializerTest extends SeriplatingTestCase
                 "foo" => $t->value(),
                 "bar" => $t->references("bars"),
             ]),
+            "qux" => $t->nullable()->references("bars"),
             "nested" => $t->conditions("type", [
                 "foo" => $t->value(),
                 "bar" => [
@@ -172,11 +173,13 @@ class GenericSerializerTest extends SeriplatingTestCase
         $entity1 = [
             "type" => "foo",
             "data" => "foo-value",
+            "qux" => null,
             "nested" => "foo-value",
         ];
         $entity2 = [
             "type" => "bar",
             "data" => 123,
+            "qux" => 123,
             "nested" => [
                 "baz" => "baz-value"
             ],
@@ -184,11 +187,13 @@ class GenericSerializerTest extends SeriplatingTestCase
         $expected1 = [
             "type" => "foo",
             "data" => "foo-value",
+            "qux" => null,
             "nested" => "foo-value",
         ];
         $expected2 = [
             "type" => "bar",
             "data" => ["_ref" => "bars_0"],
+            "qux" => ["_ref" => "bars_0"],
             "nested" => [
                 "baz" => "baz-value",
             ]
