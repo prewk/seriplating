@@ -33,6 +33,14 @@ class IdResolver implements IdResolverInterface
      */
     protected $deferred;
 
+    /**
+     * @var array
+     */
+    protected $resolveEventHandlers = [];
+
+    /**
+     * @ignore
+     */
     public function __construct()
     {
         $this->deferred = new SplObjectStorage;
@@ -133,6 +141,14 @@ class IdResolver implements IdResolverInterface
 
                 // Now, update with the whole deep dot notation, using the resolved db id as a value
                 Arr::set($update, $record["primaryKey"] . "." . $record["field"], $dbId);
+
+                // Call resolve event handlers if needed
+                $internalIdType = array_values(explode("_", $record["internalId"]))[0];
+                if (isset($this->resolveEventHandlers[$internalIdType])) {
+                    foreach ($this->resolveEventHandlers[$internalIdType] as $eventHandler) {
+                        call_user_func($eventHandler, $repository, $record["primaryKey"], $dbId);
+                    }
+                }
             }
 
             // Perform the updates
@@ -193,5 +209,21 @@ class IdResolver implements IdResolverInterface
         ];
 
         $this->deferred[$repository] = $records;
+    }
+
+    /**
+     * Register callbacks on resolve of certain internal id names
+     *
+     * @param mixed $internalId The internal id reference
+     * @param callable $eventHandler A callable with which to handle the event
+     * @return void
+     */
+    public function onResolve($internalId, callable $eventHandler)
+    {
+        if (!isset($this->resolveEventHandlers[$internalId])) {
+            $this->resolveEventHandlers[$internalId] = [];
+        }
+
+        $this->resolveEventHandlers[$internalId][] = $eventHandler;
     }
 }

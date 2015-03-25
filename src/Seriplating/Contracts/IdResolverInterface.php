@@ -37,6 +37,15 @@ interface IdResolverInterface
     public function defer($internalId, $repository, $primaryKey, $field, $initialEntityData = [], $fallback = null);
 
     /**
+     * Register callbacks on resolve of certain internal id names
+     *
+     * @param mixed $internalId The internal id reference
+     * @param callable $eventHandler A callable with which to handle the event
+     * @return void
+     */
+    public function onResolve($internalId, callable $eventHandler);
+
+    /**
      * Resolve the saved encountered references by performing the deferred updates
      *
      * @throws DataIntegrityException if an internal id couldn't be resolved

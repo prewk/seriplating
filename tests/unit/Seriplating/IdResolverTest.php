@@ -48,6 +48,21 @@ class IdResolverTest extends SeriplatingTestCase
         $resolver->bind("bars_3", 4);
         $resolver->defer("foos_1", $barRepository, 4, "foo_id");
 
+        $bar2Callbacked = false;
+        $bar3Callbacked = false;
+        $somethingElseCallbacked = false;
+        $resolver->onResolve("bars", function($repo, $id, $barId) use ($fooRepository, &$bar2Callbacked, &$bar3Callbacked, &$somethingElseCallbacked) {
+            $this->assertEquals($fooRepository, $repo);
+
+            if ($id === 1 && $barId === 3) {
+                $bar2Callbacked = true;
+            } else if ($id === 1 && $barId === 4) {
+                $bar3Callbacked = true;
+            } else {
+                $somethingElseCallbacked = true;
+            }
+        });
+
         $fooRepository
             ->shouldReceive("update")
             ->once()
@@ -74,6 +89,10 @@ class IdResolverTest extends SeriplatingTestCase
             ]);
 
         $resolver->resolve();
+
+        $this->assertTrue($bar2Callbacked);
+        $this->assertTrue($bar3Callbacked);
+        $this->assertFalse($somethingElseCallbacked);
     }
 
     public function test_internal_id_arrays()
