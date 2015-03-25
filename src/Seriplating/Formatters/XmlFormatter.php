@@ -51,6 +51,10 @@ class XmlFormatter implements FormatterInterface
                     } else {
                         $rootNode->addAttribute("id", $value);
                     }
+                } else if (is_null($value)) {
+                    // If value is null, denote it in the attribute
+                    $child = $xml->addChild($key);
+                    $child->addAttribute("nonscalar", "null");
                 } else {
                     // Value
                     $xml->addChild($key, $value);
@@ -93,9 +97,12 @@ class XmlFormatter implements FormatterInterface
 
             if (count($children) === 0) {
                 // Return value
-                if ($attributes["ref"]) {
+                if (!is_null($attributes["ref"])) {
                     // Special case: ref
                     $tree[$key] = ["_ref" => (string)$attributes["ref"]];
+                } elseif (!is_null($attributes["nonscalar"]) && (string)$attributes["nonscalar"] === "null") {
+                    // Special case: non-scalar null
+                    $tree[$key] = null;
                 } else {
                     // Normal value
                     $tree[$key] = (string)$value;
