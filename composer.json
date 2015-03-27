@@ -12,8 +12,10 @@
             "Prewk\\": "src"
         }
     },
+    "require-dev": {
+      "mockery/mockery": "dev-master"
+    },
     "require": {
-        "mockery/mockery": "dev-master",
         "laravel/framework": ">=4.2"
     }
 }
