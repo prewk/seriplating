@@ -4,7 +4,6 @@ namespace Prewk\Seriplating;
 
 use Illuminate\Support\Arr;
 use Prewk\Seriplating\Contracts\IdResolverInterface;
-use Prewk\Seriplating\Contracts\RepositoryInterface;
 use Prewk\Seriplating\Errors\IntegrityException;
 use SplObjectStorage;
 

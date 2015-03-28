@@ -4,7 +4,6 @@ namespace Prewk;
 
 use Prewk\Seriplating\Contracts\BidirectionalTemplateInterface;
 use Prewk\Seriplating\Contracts\DeserializerInterface;
-use Prewk\Seriplating\Contracts\RepositoryInterface;
 use Prewk\Seriplating\Contracts\SerializerInterface;
 
 /**
