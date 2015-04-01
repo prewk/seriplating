@@ -50,6 +50,19 @@ class GenericDeserializer implements DeserializerInterface
     }
 
     /**
+     * Create the entity in the repository and return results
+     * In its own method for extensibility
+     *
+     * @param mixed $repository Target repository
+     * @param array $entityData Entity data to create
+     * @return array
+     */
+    protected function repositoryAction($repository, array $entityData)
+    {
+        return $repository->create($entityData);
+    }
+
+    /**
      * Deserialize according to the rules set up in the template into the repository
      *
      * @param array $template Seriplater template
@@ -72,7 +85,7 @@ class GenericDeserializer implements DeserializerInterface
         $entityData = $this->walkDeserializedData($template, $toDeserialize, "");
 
         // Create the entity via the repository
-        $createdEntity = $repository->create($entityData);
+        $createdEntity = $this->repositoryAction($repository, $entityData);
         $primaryKey = $createdEntity[$primaryKeyField];
 
         // Was an internal id to this entity caught?
