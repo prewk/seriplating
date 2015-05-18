@@ -54,7 +54,19 @@ class XmlFormatter implements FormatterInterface
                 } else if (is_null($value)) {
                     // If value is null, denote it in the attribute
                     $child = $xml->addChild($key);
-                    $child->addAttribute("nonscalar", "null");
+                    $child->addAttribute("scalar", "null");
+                } else if (is_int($value)) {
+                    // If value is int, denote it in the attribute
+                    $child = $xml->addChild($key, $value);
+                    $child->addAttribute("scalar", "integer");
+                } else if (is_float($value)) {
+                    // If value is float, denote it in the attribute
+                    $child = $xml->addChild($key, $value);
+                    $child->addAttribute("scalar", "float");
+                } else if (is_bool($value)) {
+                    // If value is boolean, denote it in the attribute
+                    $child = $xml->addChild($key, $value ? 1 : 0);
+                    $child->addAttribute("scalar", "boolean");
                 } else {
                     // Value
                     $xml->addChild($key, $value);
@@ -100,11 +112,20 @@ class XmlFormatter implements FormatterInterface
                 if (!is_null($attributes["ref"])) {
                     // Special case: ref
                     $tree[$key] = ["_ref" => (string)$attributes["ref"]];
-                } elseif (!is_null($attributes["nonscalar"]) && (string)$attributes["nonscalar"] === "null") {
-                    // Special case: non-scalar null
+                } elseif (!is_null($attributes["scalar"]) && (string)$attributes["scalar"] === "null") {
+                    // Scalar null
                     $tree[$key] = null;
+                } elseif (!is_null($attributes["scalar"]) && (string)$attributes["scalar"] === "integer") {
+                    // Scalar integer
+                    $tree[$key] = (int)$value;
+                } elseif (!is_null($attributes["scalar"]) && (string)$attributes["scalar"] === "float") {
+                    // Scalar float
+                    $tree[$key] = (float)$value;
+                } elseif (!is_null($attributes["scalar"]) && (string)$attributes["scalar"] === "boolean") {
+                    // Scalar boolean
+                    $tree[$key] = (string)$value === "1";
                 } else {
-                    // Normal value
+                    // Normal string value
                     $tree[$key] = (string)$value;
                 }
             } else {
