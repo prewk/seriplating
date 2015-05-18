@@ -30,40 +30,46 @@ class XmlFormatter implements FormatterInterface
         foreach ($serialized as $key => $value) {
             if (is_array($value)) {
                 // Branch
-                if (is_numeric($key)) {
-                    // Numeric in array, singularize
-                    $key = Pluralizer::singular($parentName);
-                    if (!isset($parentNode["array"])) {
-                        $parentNode->addAttribute("array", $key);
+                if (count($value) === 0) {
+                    // Empty array
+                    $child = $xml->addChild($key);
+                    $child->addAttribute("array", null);
+                } else {
+                    if (is_numeric($key)) {
+                        // Numeric in array, singularize
+                        $key = Pluralizer::singular($parentName);
+                        if (!isset($parentNode["array"])) {
+                            $parentNode->addAttribute("array", $key);
+                        }
                     }
+                    $child = $xml->addChild($key);
+                    $this->formatTree($child, $value, $rootNode, $key, $child);
                 }
-                $child = $xml->addChild($key);
-                $this->formatTree($child, $value, $rootNode, $key, $child);
             } else {
                 // Leaf
                 if ($key === "_ref") {
                     // Ref
                     $parentNode->addAttribute("ref", $value);
-                } else if ($key === "_id") {
+                } elseif ($key === "_id") {
                     // Id
                     if (!is_null($parentNode)) {
                         $parentNode->addAttribute("id", $value);
                     } else {
                         $rootNode->addAttribute("id", $value);
                     }
-                } else if (is_null($value)) {
+                } elseif (is_null($value)) {
                     // If value is null, denote it in the attribute
                     $child = $xml->addChild($key);
                     $child->addAttribute("scalar", "null");
-                } else if (is_int($value)) {
+                } elseif (is_int($value)) {
                     // If value is int, denote it in the attribute
                     $child = $xml->addChild($key, $value);
                     $child->addAttribute("scalar", "integer");
-                } else if (is_float($value)) {
+                } elseif (is_float($value)) {
                     // If value is float, denote it in the attribute
                     $child = $xml->addChild($key, $value);
                     $child->addAttribute("scalar", "float");
-                } else if (is_bool($value)) {
+                } elseif (is_bool($value)) {
                     // If value is boolean, denote it in the attribute
                     $child = $xml->addChild($key, $value ? 1 : 0);
                     $child->addAttribute("scalar", "boolean");
@@ -112,18 +118,29 @@ class XmlFormatter implements FormatterInterface
                 if (!is_null($attributes["ref"])) {
                     // Special case: ref
                     $tree[$key] = ["_ref" => (string)$attributes["ref"]];
-                } elseif (!is_null($attributes["scalar"]) && (string)$attributes["scalar"] === "null") {
-                    // Scalar null
-                    $tree[$key] = null;
-                } elseif (!is_null($attributes["scalar"]) && (string)$attributes["scalar"] === "integer") {
-                    // Scalar integer
-                    $tree[$key] = (int)$value;
-                } elseif (!is_null($attributes["scalar"]) && (string)$attributes["scalar"] === "float") {
-                    // Scalar float
-                    $tree[$key] = (float)$value;
-                } elseif (!is_null($attributes["scalar"]) && (string)$attributes["scalar"] === "boolean") {
-                    // Scalar boolean
-                    $tree[$key] = (string)$value === "1";
+                } elseif (!is_null($attributes["scalar"])) {
+                    $scalarAttr = (string)$attributes["scalar"];
+                    switch ($scalarAttr) {
+                        case "null":
+                            // Scalar null
+                            $tree[$key] = null;
+                            break;
+                        case "integer":
+                            // Scalar integer
+                            $tree[$key] = (int)$value;
+                            break;
+                        case "float":
+                            // Scalar float
+                            $tree[$key] = (float)$value;
+                            break;
+                        case "boolean":
+                            // Scalar boolean
+                            $tree[$key] = (string)$value === "1";
+                            break;
+                    }
+                } elseif (!is_null($attributes["array"])) {
+                    // Empty array
+                    $tree[$key] = [];
                 } else {
                     // Normal string value
                     $tree[$key] = (string)$value;

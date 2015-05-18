@@ -9,7 +9,7 @@ class XmlFormatterTest extends SeriplatingTestCase
 {
     private function getSerialization()
     {
-        return json_decode('{"_id":"menus_0","locale":null,"menu_items":[{"_id":"menu_items_1","parent_id":{"_ref":"menu_items_2"},"sort_order":0},{"_id":"menu_items_3","parent_id":{"_ref":"menu_items_2"},"sort_order":1},{"_id":"menu_items_4","parent_id":{"_ref":"menu_items_3"},"sort_order":5}],"data":{"a":1,"b":1.2,"c":"1","d":true,"e":false}}', true);
+        return json_decode('{"_id":"menus_0","locale":null,"menu_items":[{"_id":"menu_items_1","parent_id":{"_ref":"menu_items_2"},"sort_order":0},{"_id":"menu_items_3","parent_id":{"_ref":"menu_items_2"},"sort_order":1},{"_id":"menu_items_4","parent_id":{"_ref":"menu_items_3"},"sort_order":5}],"data":{"a":1,"b":1.2,"c":"1","d":true,"e":false,"f":[]}}', true);
     }
 
     public function test_formatSerialized()
