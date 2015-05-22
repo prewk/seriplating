@@ -163,7 +163,11 @@ class HierarchicalTemplate implements HierarchicalInterface
         foreach ($template->getTemplate() as $field => $rule) {
             if ($rule instanceof RuleInterface) {
                 if ($rule->isHasMany()) {
-                    $entityData[$field] = $this->handleHasManyRule($rule, $data, $field, $entityData);
+                    if (isset($data[$field])) {
+                        $entityData[$field] = $this->handleHasManyRule($rule, $data, $field, $entityData);
+                    } elseif (!$rule->isOptional()) {
+                        throw new HierarchicalCompositionException("Related entity '" . $rule->getValue() . "'s data didn't exist where it was expected");
+                    }
                 }
             }
         }
@@ -188,10 +192,6 @@ class HierarchicalTemplate implements HierarchicalInterface
 
         if (!isset($this->templateRegistry[$relatedEntityName])) {
             throw new HierarchicalCompositionException("Related entity '$relatedEntityName' wasn't found in the registry");
-        }
-
-        if (!isset($data[$field])) {
-            throw new HierarchicalCompositionException("Related entity '$relatedEntityName's data didn't exist where it was expected");
         }
 
         // Look ahead at child for increment rules
